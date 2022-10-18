@@ -33,4 +33,20 @@ public class PostService {
     public Optional<Post> findById(long id) {
         return postRepository.findById(id);
     }
+
+    @Transactional
+    public void modify(long id, String subject, String content, String contentHtml) {
+        Post post = postRepository.findById(id).get();
+
+        if (!post.getSubject().equals(subject)) {
+            post.setSubject(subject);
+        }
+
+        if (!post.getContent().equals(content)) {
+            post.setContent(content);
+            post.setContentHtml(contentHtml);
+        }
+
+        postRepository.save(post);
+    }
 }

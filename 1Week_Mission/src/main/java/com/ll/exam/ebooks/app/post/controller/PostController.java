@@ -2,7 +2,7 @@ package com.ll.exam.ebooks.app.post.controller;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
-import com.ll.exam.ebooks.app.post.dto.request.PostWriteRequestDto;
+import com.ll.exam.ebooks.app.post.dto.request.PostRequestDto;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +34,12 @@ public class PostController {
 
     @PreAuthorize("hasAuthority('AUTHOR')")
     @PostMapping("/write")
-    public String write(@Valid PostWriteRequestDto writeDto, Principal principal) {
+    public String write(@Valid PostRequestDto postDto, Principal principal) {
         String username = principal.getName();
 
         Member author = memberService.findByUsername(username).get();
 
-        postService.save(author, writeDto.getSubject(), writeDto.getContent(), writeDto.getContentHtml());
+        postService.save(author, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml());
 
         return "redirect:/";
     }
@@ -52,5 +52,13 @@ public class PostController {
         model.addAttribute("post", post);
 
         return "/post/modify";
+    }
+
+    @PreAuthorize("hasAuthority('AUTHOR')")
+    @PostMapping("/{id}/modify")
+    public String modify(@PathVariable long id, @Valid PostRequestDto postDto) {
+        postService.modify(id, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml());
+
+        return "redirect:/";
     }
 }

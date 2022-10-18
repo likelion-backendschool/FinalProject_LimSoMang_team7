@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @AllArgsConstructor
-public class PostWriteRequestDto {
+public class PostRequestDto {
     @NotEmpty
     private String subject;
 
