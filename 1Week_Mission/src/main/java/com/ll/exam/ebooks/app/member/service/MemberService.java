@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -52,5 +54,15 @@ public class MemberService {
         }
 
         return authLevel;
+    }
+
+    public Member findByEmail(String email) {
+        if (memberRepository.findByEmail(email).isEmpty()) {
+            throw new NoSuchElementException();
+        }
+
+        Member member = memberRepository.findByEmail(email).get();
+
+        return member;
     }
 }

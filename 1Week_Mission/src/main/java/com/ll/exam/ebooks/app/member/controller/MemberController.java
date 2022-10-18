@@ -1,5 +1,6 @@
 package com.ll.exam.ebooks.app.member.controller;
 
+import com.ll.exam.ebooks.app.member.dto.request.MemberFindRequestDto;
 import com.ll.exam.ebooks.app.member.dto.request.MemberJoinRequestDto;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
 
@@ -42,5 +44,14 @@ public class MemberController {
     @GetMapping("/findUsername")
     public String showFindUsername() {
         return "member/findUsername";
+    }
+
+    @PreAuthorize("isAnonymous()")
+    @PostMapping("/findUsername")
+    @ResponseBody
+    public String findUsername(MemberFindRequestDto findDto) {
+        Member member = memberService.findByEmail(findDto.getEmail());
+
+        return member.getUsername();
     }
 }
