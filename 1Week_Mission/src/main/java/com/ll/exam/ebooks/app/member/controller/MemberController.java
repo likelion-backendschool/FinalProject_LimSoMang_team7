@@ -2,6 +2,7 @@ package com.ll.exam.ebooks.app.member.controller;
 
 import com.ll.exam.ebooks.app.member.dto.request.MemberFindRequestDto;
 import com.ll.exam.ebooks.app.member.dto.request.MemberJoinRequestDto;
+import com.ll.exam.ebooks.app.member.dto.request.MemberModifyRequestDto;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +61,8 @@ public class MemberController {
     @PostMapping("/findUsername")
     @ResponseBody
     public String findUsername(@Valid MemberFindRequestDto findDto) {
-        Member member = memberService.findByEmail(findDto.getEmail());
+        Member member = memberService.findByEmail(findDto.getEmail()).get();
+
         if (member != null) {
             return member.getUsername();
         } else {
@@ -78,7 +80,7 @@ public class MemberController {
     @PostMapping("/findPassword")
     @ResponseBody
     public String findPassword(@Valid MemberFindRequestDto findDto) {
-        Member member = memberService.findByUsernameAndEmail(findDto.getUsername(), findDto.getEmail());
+        Member member = memberService.findByUsernameAndEmail(findDto.getUsername(), findDto.getEmail()).get();
 
         if (member != null) {
             UUID uuid = UUID.randomUUID();
@@ -101,7 +103,7 @@ public class MemberController {
     public String showProfile(Principal principal, Model model) {
         String username = principal.getName();
 
-        Member member = memberService.findByUsername(username);
+        Member member = memberService.findByUsername(username).get();
 
         model.addAttribute("member", member);
 
@@ -113,10 +115,18 @@ public class MemberController {
     public String showModify(Principal principal, Model model) {
         String username = principal.getName();
 
-        Member member = memberService.findByUsername(username);
+        Member member = memberService.findByUsername(username).get();
 
         model.addAttribute("member", member);
 
         return "member/modify";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify")
+    public String modify(@Valid MemberModifyRequestDto modifyDto) {
+        memberService.modify(modifyDto.getUsername(), modifyDto.getEmail(), modifyDto.getNickname());
+
+        return "redirect:/";
     }
 }

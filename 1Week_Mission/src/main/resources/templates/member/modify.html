@@ -12,11 +12,21 @@
         <div class="max-w-md w-full px-2 pt-4">
             <h1 class="font-bold text-2xl text-center mb-3">프로필 수정</h1>
 
-            <script>
+            <script th:inline="javascript">
                 let MemberModify__submitDone = false;
 
                 function MemberModify__submit(form) {
                     if (MemberModify__submitDone) {
+                        return;
+                    }
+
+                    /*<![CDATA[*/
+                    const email = [[${member.getEmail()}]];
+                    const nickname = [[${member.getNickname()}]];
+                    /*]]>*/
+
+                    if (email == form.email.value.trim() && nickname == form.nickname.value.trim()) {
+                        warningModal("변경사항이 없습니다.");
                         return;
                     }
 
@@ -31,15 +41,17 @@
 
                     form.nickname.value = form.nickname.value.trim();
 
-                    if (form.nickname.value.length == 0) {
-                        warningModal("닉네임을 입력해주세요.");
-                        form.nickname.focus();
+                    if (nickname != form.nickname.value) {
+                        if (form.nickname.value.length == 0) {
+                            warningModal("닉네임을 입력해주세요.");
+                            form.nickname.focus();
 
-                        return;
+                            return;
+                        }
                     }
 
                     form.submit();
-                    MemberLogin__submitDone = true;
+                    MemberModify__submitDone = true;
                 }
             </script>
 
@@ -48,7 +60,7 @@
                     <label class="label">
                         <span class="label-text">아이디</span>
                     </label>
-                    <input type="text" name="username" class="input input-bordered" th:value="${member.getUsername()}" disabled>
+                    <input type="text" name="username" class="input input-bordered" th:value="${member.getUsername()}" readonly>
                 </div>
 
                 <div class="form-control">

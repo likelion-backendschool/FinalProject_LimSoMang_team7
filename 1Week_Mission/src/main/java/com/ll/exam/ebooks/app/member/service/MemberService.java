@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -48,6 +48,7 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public void mailSend(Member member, String subject, String message) {
         MailRequestDto mailDto = MailRequestDto
                 .builder()
@@ -59,21 +60,40 @@ public class MemberService {
         mailService.mailSend(mailDto);
     }
 
-    public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email).orElse(null);
+    @Transactional(readOnly = true)
+    public Optional<Member> findByEmail(String email) {
+        return memberRepository.findByEmail(email);
     }
 
-    public Member findByUsernameAndEmail(String username, String email) {
-        return memberRepository.findByUsernameAndEmail(username, email).orElse(null);
+    @Transactional(readOnly = true)
+    public Optional<Member> findByUsernameAndEmail(String username, String email) {
+        return memberRepository.findByUsernameAndEmail(username, email);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Member> findByUsername(String username) {
+        return memberRepository.findByUsername(username);
+    }
+
+    @Transactional
     public void setTempPassword(Member member, String tempPassword) {
         member.setPassword(passwordEncoder.encode(tempPassword));
 
         memberRepository.save(member);
     }
 
-    public Member findByUsername(String username) {
-        return memberRepository.findByUsername(username).get();
+    @Transactional
+    public void modify(String username, String email, String nickname) {
+        Member member = memberRepository.findByUsername(username).get();
+
+        if (memberRepository.findByEmail(email).isEmpty()) {
+            member.setEmail(email);
+        }
+
+        if (memberRepository.findByNickname(nickname).isEmpty()) {
+            member.setNickname(nickname);
+        }
+
+        memberRepository.save(member);
     }
 }
