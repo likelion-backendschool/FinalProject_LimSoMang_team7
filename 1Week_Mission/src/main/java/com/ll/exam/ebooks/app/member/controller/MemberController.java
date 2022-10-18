@@ -56,4 +56,10 @@ public class MemberController {
 
         return member.getUsername();
     }
+
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/findPassword")
+    public String showFindPassword() {
+        return "member/findPassword";
+    }
 }
