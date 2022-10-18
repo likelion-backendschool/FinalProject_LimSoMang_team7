@@ -2,7 +2,7 @@ package com.ll.exam.ebooks.app.member.controller;
 
 import com.ll.exam.ebooks.app.member.dto.request.MemberFindRequestDto;
 import com.ll.exam.ebooks.app.member.dto.request.MemberJoinRequestDto;
-import com.ll.exam.ebooks.app.member.dto.request.MemberModifyRequestDto;
+import com.ll.exam.ebooks.app.member.dto.request.MemberModifyProfileRequestDto;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -124,9 +124,21 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify")
-    public String modify(@Valid MemberModifyRequestDto modifyDto) {
+    public String modify(@Valid MemberModifyProfileRequestDto modifyDto) {
         memberService.modify(modifyDto.getUsername(), modifyDto.getEmail(), modifyDto.getNickname());
 
         return "redirect:/";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modifyPassword")
+    public String showModifyPassword(Principal principal, Model model) {
+        String username = principal.getName();
+
+        Member member = memberService.findByUsername(username).get();
+
+        model.addAttribute("member", member);
+
+        return "member/modifyPassword";
     }
 }
