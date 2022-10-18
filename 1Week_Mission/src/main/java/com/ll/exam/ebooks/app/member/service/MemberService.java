@@ -3,6 +3,8 @@ package com.ll.exam.ebooks.app.member.service;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.exception.AlreadyJoinException;
 import com.ll.exam.ebooks.app.member.exception.DuplicateNicknameException;
+import com.ll.exam.ebooks.app.member.mail.dto.MailRequestDto;
+import com.ll.exam.ebooks.app.member.mail.service.MailService;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,8 +18,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
 
     @Transactional
@@ -54,6 +56,20 @@ public class MemberService {
         }
 
         return authLevel;
+    }
+
+    public void mailSend(Member member) {
+        String subject = "🦁멋북스 회원가입을 진심으로 환영합니다.";
+        String message = "멋쟁이사자처럼, 책 많이 읽고 멋쟁이 되세요. 😎";
+
+        MailRequestDto mailDto = MailRequestDto
+                .builder()
+                .to(member.getEmail())
+                .subject(subject)
+                .message(message)
+                .build();
+
+        mailService.mailSend(mailDto);
     }
 
     public Member findByEmail(String email) {

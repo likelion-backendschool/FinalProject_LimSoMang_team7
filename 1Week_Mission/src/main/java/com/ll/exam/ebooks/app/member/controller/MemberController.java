@@ -29,7 +29,9 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/join")
     public String join(@Valid MemberJoinRequestDto joinDto) {
-        memberService.join(joinDto.getUsername(), joinDto.getPassword(), joinDto.getEmail(), joinDto.getNickname());
+        Member member = memberService.join(joinDto.getUsername(), joinDto.getPassword(), joinDto.getEmail(), joinDto.getNickname());
+
+        memberService.mailSend(member);
 
         return "redirect:/member/login";
     }
