@@ -73,6 +73,14 @@
                     return;
                 }
 
+                let contentLength = markdown.trim().length;
+
+                if (markdown.trim().length < 1000) {
+                    warningModal("최소 1000자 이상 작성해야 글을 발행할 수 있습니다. 현재 글자 수 : " + contentLength);
+
+                    return;
+                }
+
                 form.content.value = markdown;
                 form.contentHtml.value = html;
 
