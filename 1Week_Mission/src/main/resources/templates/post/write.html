@@ -12,37 +12,6 @@
         <div class="max-w-2xl w-full px-2 pt-4">
             <h1 class="font-bold text-2xl text-center mb-3">글 작성</h1>
 
-           <script th:inline="javascript">
-                let PostWrite__submitDone = false;
-
-                function PostWrite__submit(form) {
-                    if (PostWrite__submitDone) {
-                        return;
-                    }
-
-                    form.subject.value = form.subject.value.trim();
-
-                    if (form.subject.value.length == 0) {
-                        warningModal("제목을 입력해주세요.");
-                        form.subject.focus();
-
-                        return;
-                    }
-
-                    form.content.value = form.content.value.trim();
-
-                    if (form.content.value.length == 0) {
-                        warningModal("제목을 입력해주세요.");
-                        form.subject.focus();
-
-                        return;
-                    }
-
-                    form.submit();
-                    PostWrite__submitDone = true;
-                }
-            </script>
-
             <form th:action method="POST" class=" flex flex-col" onsubmit="PostWrite__submit(this); return false;">
                 <div class="form-control mb-3">
                     <label class="label">
@@ -51,13 +20,15 @@
                     <input type="text" name="subject" class="input input-bordered">
                 </div>
 
-                <div id="editor" name="content"></div>
+                <div id="content"></div>
+                <input type="hidden" name="content">
+                <input type="hidden" name="contentHtml">
 
                 <div class="form-control mt-3">
                     <label class="label">
                         <span class="label-text">해시태그</span>
                     </label>
-                    <input type="text" placeholder="최소 1개, 최대 10개" class="input input-bordered">
+                    <input type="text" name="keywords" placeholder="최소 1개, 최대 10개" class="input input-bordered">
                 </div>
 
 
@@ -67,17 +38,58 @@
             </form>
         </div>
 
-        <script>
+        <script th:inline="javascript">
             const Editor = toastui.Editor;
 
-            const editor = new Editor({
-                el: document.querySelector('#editor'),
+            const content = new Editor({
+                el: document.querySelector('#content'),
                 height: '500px',
                 initialEditType: 'markdown',
                 previewStyle: 'vertical'
             });
 
-            editor.getMarkdown();
+            let PostWrite__submitDone = false;
+
+            function PostWrite__submit(form) {
+                if (PostWrite__submitDone) {
+                    return;
+                }
+
+                form.subject.value = form.subject.value.trim();
+
+                if (form.subject.value.length == 0) {
+                    warningModal("제목을 입력해주세요.");
+                    form.subject.focus();
+
+                    return;
+                }
+
+                const markdown = content.getMarkdown();
+                const html = content.getHTML();
+
+                if (markdown.trim().length == 0) {
+                    warningModal("내용을 입력해주세요.");
+
+                    return;
+                }
+
+                form.content.value = markdown;
+                form.contentHtml.value = html;
+
+                /*
+                form.keywords.value = form.keywords.value.trim();
+
+                if (form.keywords.value.length == 0) {
+                    warningModal("최소 1개의 해시태그를 입력해주세요.");
+                    form.keywords.focus();
+
+                    return;
+                }
+                */
+
+                form.submit();
+                PostWrite__submitDone = true;
+            }
         </script>
 
     </section>
