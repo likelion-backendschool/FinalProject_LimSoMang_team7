@@ -39,9 +39,6 @@
                         data: memberFindRequestDto,
                         success: data => {
                             $("#showUsername").text(data);
-                        },
-                        error: () => {
-                            $("#showUsername").text("가입되지 않은 이메일입니다.");
                         }
                     });
 

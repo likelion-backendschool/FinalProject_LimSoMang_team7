@@ -31,7 +31,10 @@ public class MemberController {
     public String join(@Valid MemberJoinRequestDto joinDto) {
         Member member = memberService.join(joinDto.getUsername(), joinDto.getPassword(), joinDto.getEmail(), joinDto.getNickname());
 
-        memberService.mailSend(member);
+        String subject = "🦁멋북스 회원가입을 진심으로 환영합니다.";
+        String message = "멋쟁이사자처럼, 책 많이 읽고 멋쟁이 되세요. 😎";
+
+        memberService.mailSend(member, subject, message);
 
         return "redirect:/member/login";
     }
@@ -51,10 +54,13 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/findUsername")
     @ResponseBody
-    public String findUsername(MemberFindRequestDto findDto) {
+    public String findUsername(@Valid MemberFindRequestDto findDto) {
         Member member = memberService.findByEmail(findDto.getEmail());
-
-        return member.getUsername();
+        if (member != null) {
+            return member.getUsername();
+        } else {
+            return "가입되지 않은 이메일입니다.";
+        }
     }
 
     @PreAuthorize("isAnonymous()")

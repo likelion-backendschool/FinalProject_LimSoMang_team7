@@ -58,10 +58,7 @@ public class MemberService {
         return authLevel;
     }
 
-    public void mailSend(Member member) {
-        String subject = "🦁멋북스 회원가입을 진심으로 환영합니다.";
-        String message = "멋쟁이사자처럼, 책 많이 읽고 멋쟁이 되세요. 😎";
-
+    public void mailSend(Member member, String subject, String message) {
         MailRequestDto mailDto = MailRequestDto
                 .builder()
                 .to(member.getEmail())
@@ -73,12 +70,6 @@ public class MemberService {
     }
 
     public Member findByEmail(String email) {
-        if (memberRepository.findByEmail(email).isEmpty()) {
-            throw new NoSuchElementException();
-        }
-
-        Member member = memberRepository.findByEmail(email).get();
-
-        return member;
+        return memberRepository.findByEmail(email).orElse(null);
     }
 }
