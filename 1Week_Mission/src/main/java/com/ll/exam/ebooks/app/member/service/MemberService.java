@@ -72,4 +72,14 @@ public class MemberService {
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElse(null);
     }
+
+    public Member findByUsernameAndEmail(String username, String email) {
+        return memberRepository.findByUsernameAndEmail(username, email).orElse(null);
+    }
+
+    public void setTempPassword(Member member, String tempPassword) {
+        member.setPassword(passwordEncoder.encode(tempPassword));
+
+        memberRepository.save(member);
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/member")
@@ -67,5 +68,27 @@ public class MemberController {
     @GetMapping("/findPassword")
     public String showFindPassword() {
         return "member/findPassword";
+    }
+
+    @PreAuthorize("isAnonymous()")
+    @PostMapping("/findPassword")
+    @ResponseBody
+    public String findPassword(@Valid MemberFindRequestDto findDto) {
+        Member member = memberService.findByUsernameAndEmail(findDto.getUsername(), findDto.getEmail());
+
+        if (member != null) {
+            UUID uuid = UUID.randomUUID();
+            String tempPassword = uuid.toString().substring(0, 6);
+            memberService.setTempPassword(member, tempPassword);
+
+            String subject = "🦁멋북스 " + member.getUsername() + "의 임시 비밀번호가 발급되었습니다.";
+            String message = member.getUsername() + "의 임시 비밀번호는 " + tempPassword + " 입니다.😎";
+
+            memberService.mailSend(member, subject, message);
+
+            return "임시 비밀번호가 발급되었습니다. 이메일을 확인하세요.";
+        } else {
+            return "입력하신 정보가 올바르지 않습니다.";
+        }
     }
 }
