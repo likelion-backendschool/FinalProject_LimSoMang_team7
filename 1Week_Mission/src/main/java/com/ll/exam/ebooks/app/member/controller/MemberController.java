@@ -5,19 +5,24 @@ import com.ll.exam.ebooks.app.member.dto.request.MemberJoinRequestDto;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.UUID;
 
 @Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
 
@@ -90,5 +95,17 @@ public class MemberController {
         } else {
             return "입력하신 정보가 올바르지 않습니다.";
         }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/profile")
+    public String showProfile(Principal principal, Model model) {
+        String username = principal.getName();
+
+        Member member = memberService.findByUsername(username);
+
+        model.addAttribute("member", member);
+
+        return "member/profile";
     }
 }
