@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>글 작성</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-2xl w-full px-2 pt-4">
+            <h1 class="font-bold text-2xl text-center mb-3">글 작성</h1>
+
+           <script th:inline="javascript">
+                let PostWrite__submitDone = false;
+
+                function PostWrite__submit(form) {
+                    if (PostWrite__submitDone) {
+                        return;
+                    }
+
+                    form.subject.value = form.subject.value.trim();
+
+                    if (form.subject.value.length == 0) {
+                        warningModal("제목을 입력해주세요.");
+                        form.subject.focus();
+
+                        return;
+                    }
+
+                    form.content.value = form.content.value.trim();
+
+                    if (form.content.value.length == 0) {
+                        warningModal("제목을 입력해주세요.");
+                        form.subject.focus();
+
+                        return;
+                    }
+
+                    form.submit();
+                    PostWrite__submitDone = true;
+                }
+            </script>
+
+            <form th:action method="POST" class=" flex flex-col" onsubmit="PostWrite__submit(this); return false;">
+                <div class="form-control mb-3">
+                    <label class="label">
+                        <span class="label-text">제목</span>
+                    </label>
+                    <input type="text" name="subject" class="input input-bordered">
+                </div>
+
+                <div id="editor" name="content"></div>
+
+                <div class="form-control mt-3">
+                    <label class="label">
+                        <span class="label-text">해시태그</span>
+                    </label>
+                    <input type="text" placeholder="최소 1개, 최대 10개" class="input input-bordered">
+                </div>
+
+
+                <div class="grid mt-3">
+                    <input class="btn btn-primary" type="submit" value="작성하기">
+                </div>
+            </form>
+        </div>
+
+        <script>
+            const Editor = toastui.Editor;
+
+            const editor = new Editor({
+                el: document.querySelector('#editor'),
+                height: '500px',
+                initialEditType: 'markdown',
+                previewStyle: 'vertical'
+            });
+
+            editor.getMarkdown();
+        </script>
+
+    </section>
+
+</main>
+</body>
+</html>
