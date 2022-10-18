@@ -128,7 +128,7 @@ public class MemberController {
     public String modify(@Valid MemberModifyProfileRequestDto modifyDto) {
         memberService.modify(modifyDto.getUsername(), modifyDto.getEmail(), modifyDto.getNickname());
 
-        return "redirect:/";
+        return "redirect:/member/profile";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -148,6 +148,6 @@ public class MemberController {
     public String modifyPassword(@Valid MemberModifyPasswordRequestDto modifyDto) {
         memberService.modifyPassword(modifyDto.getUsername(), modifyDto.getPassword());
 
-        return "redirect:/";
+        return "redirect:/member/profile";
     }
 }
