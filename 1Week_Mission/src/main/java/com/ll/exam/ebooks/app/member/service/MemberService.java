@@ -7,6 +7,7 @@ import com.ll.exam.ebooks.app.member.mail.dto.MailRequestDto;
 import com.ll.exam.ebooks.app.member.mail.service.MailService;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,6 +94,14 @@ public class MemberService {
         if (memberRepository.findByNickname(nickname).isEmpty()) {
             member.setNickname(nickname);
         }
+
+        memberRepository.save(member);
+    }
+
+    public void modifyPassword(String username, String password) {
+        Member member = memberRepository.findByUsername(username).get();
+
+        member.setPassword(passwordEncoder.encode(password));
 
         memberRepository.save(member);
     }

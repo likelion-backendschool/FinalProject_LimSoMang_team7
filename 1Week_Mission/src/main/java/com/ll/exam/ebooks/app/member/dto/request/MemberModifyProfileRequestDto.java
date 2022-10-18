@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @AllArgsConstructor
-public class MemberModifyRequestDto {
+public class MemberModifyProfileRequestDto {
     @NotEmpty
     private String username;
 

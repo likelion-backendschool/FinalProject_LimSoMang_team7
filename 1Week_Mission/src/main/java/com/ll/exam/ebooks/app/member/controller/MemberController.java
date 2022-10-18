@@ -2,6 +2,7 @@ package com.ll.exam.ebooks.app.member.controller;
 
 import com.ll.exam.ebooks.app.member.dto.request.MemberFindRequestDto;
 import com.ll.exam.ebooks.app.member.dto.request.MemberJoinRequestDto;
+import com.ll.exam.ebooks.app.member.dto.request.MemberModifyPasswordRequestDto;
 import com.ll.exam.ebooks.app.member.dto.request.MemberModifyProfileRequestDto;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
@@ -140,5 +141,13 @@ public class MemberController {
         model.addAttribute("member", member);
 
         return "member/modifyPassword";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modifyPassword")
+    public String modifyPassword(@Valid MemberModifyPasswordRequestDto modifyDto) {
+        memberService.modifyPassword(modifyDto.getUsername(), modifyDto.getPassword());
+
+        return "redirect:/";
     }
 }
