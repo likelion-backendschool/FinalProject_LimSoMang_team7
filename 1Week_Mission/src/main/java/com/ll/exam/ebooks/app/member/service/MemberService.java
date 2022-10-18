@@ -32,7 +32,7 @@ public class MemberService {
             throw new DuplicateNicknameException();
         }
 
-        int authLevel = checkAuthLevel(nickname);
+        int authLevel = 3;
 
         Member member = Member
                 .builder()
@@ -46,16 +46,6 @@ public class MemberService {
         memberRepository.save(member);
 
         return member;
-    }
-
-    public int checkAuthLevel(String nickname) {
-        int authLevel = 3;
-
-        if (nickname != null && nickname.trim().length() > 0) {
-            authLevel = 4;
-        }
-
-        return authLevel;
     }
 
     public void mailSend(Member member, String subject, String message) {
