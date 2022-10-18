@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("dev")
-public class DevInitData implements InitDataBefore {
+@Profile("test")
+public class TestInitData implements InitDataBefore {
     @Bean
     CommandLineRunner initData(MemberService memberService, PostService postService) {
         return args -> {
