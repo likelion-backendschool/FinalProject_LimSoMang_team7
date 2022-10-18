@@ -7,7 +7,6 @@ import com.ll.exam.ebooks.app.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -107,5 +106,17 @@ public class MemberController {
         model.addAttribute("member", member);
 
         return "member/profile";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modify")
+    public String showModify(Principal principal, Model model) {
+        String username = principal.getName();
+
+        Member member = memberService.findByUsername(username);
+
+        model.addAttribute("member", member);
+
+        return "member/modify";
     }
 }
