@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -14,7 +16,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public void save(Member author, String subject, String content, String contentHtml) {
+    public Post save(Member author, String subject, String content, String contentHtml) {
         Post post = Post
                 .builder()
                 .author(author)
@@ -24,5 +26,11 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
+
+        return post;
+    }
+
+    public Optional<Post> findById(long id) {
+        return postRepository.findById(id);
     }
 }

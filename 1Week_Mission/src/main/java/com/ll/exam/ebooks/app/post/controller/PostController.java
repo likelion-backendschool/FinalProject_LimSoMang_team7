@@ -3,12 +3,15 @@ package com.ll.exam.ebooks.app.post.controller;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.post.dto.request.PostWriteRequestDto;
+import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -39,5 +42,15 @@ public class PostController {
         postService.save(author, writeDto.getSubject(), writeDto.getContent(), writeDto.getContentHtml());
 
         return "redirect:/";
+    }
+
+    @PreAuthorize("hasAuthority('AUTHOR')")
+    @GetMapping("/{id}/modify")
+    public String showModify(@PathVariable long id, Model model) {
+        Post post = postService.findById(id).get();
+
+        model.addAttribute("post", post);
+
+        return "/post/modify";
     }
 }
