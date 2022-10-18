@@ -32,4 +32,10 @@ public class MemberController {
         return "redirect:/member/login";
     }
 
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/login")
+    public String showLogin() {
+        return "member/login";
+    }
+
 }
