@@ -38,4 +38,9 @@ public class MemberController {
         return "member/login";
     }
 
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/findUsername")
+    public String showFindUsername() {
+        return "member/findUsername";
+    }
 }
