@@ -29,7 +29,7 @@ public class PostController {
     private final MemberService memberService;
 
 
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("permitAll()")
     @GetMapping("/list")
     public String showList(Model model) {
         List<ResponsePost> posts = postService.list();
@@ -37,6 +37,16 @@ public class PostController {
         model.addAttribute("posts", posts);
 
         return "post/list";
+    }
+
+    @PreAuthorize("permitAll()")
+    @GetMapping("/{id}")
+    public String showDetail(@PathVariable long id, Model model) {
+        ResponsePost post = postService.findOne(id);
+
+        model.addAttribute("post", post);
+
+        return "post/detail";
     }
 
     @PreAuthorize("hasAuthority('AUTHOR')")

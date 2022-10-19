@@ -56,6 +56,7 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @Transactional
     public List<ResponsePost> list() {
         List<ResponsePost> posts = postRepository.findAll()
                 .stream()
@@ -63,6 +64,15 @@ public class PostService {
                 .collect(Collectors.toList());
 
         return posts;
+    }
+
+    @Transactional
+    public ResponsePost findOne(long id) {
+        Post post = postRepository.findById(id).get();
+
+        ResponsePost responsePost = getResponsePost(post);
+
+        return responsePost;
     }
 
     private ResponsePost getResponsePost(Post post) {
