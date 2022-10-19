@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>글 상세화면</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-2xl w-full px-2 pt-4">
+            <h1 class="font-bold text-2xl text-center mb-3">글 상세화면</h1>
+
+            <div class="form-control mb-3">
+                <label class="label">
+                    <span class="label-text">제목</span>
+                </label>
+                <input type="text" name="subject" class="input input-bordered" th:value="${post.subject}" disabled>
+            </div>
+
+            <div class="form-control mb-3">
+                <label class="label">
+                    <span class="label-text">내용</span>
+                </label>
+                <div id="content"></div>
+            </div>
+
+            <div class="form-control mt-3">
+                <label class="label">
+                    <span class="label-text">해시태그</span>
+                </label>
+                <input type="text" name="keywords" class="input input-bordered" disabled>
+            </div>
+
+        </div>
+
+        <script th:inline="javascript">
+            const Editor = toastui.Editor.factory;
+
+            /*<![CDATA[*/
+            const contentMarkdown = [[${post.getContent()}]];
+            /*]]>*/
+
+            const content = new Editor({
+                el: document.querySelector('#content'),
+                height: '500px',
+                viewer: true,
+                initialValue: contentMarkdown
+            });
+        </script>
+
+    </section>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>프로필 수정</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section section-login flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-md w-full px-2 pt-4">
+            <h1 class="font-bold text-2xl text-center mb-3">프로필 수정</h1>
+
+            <script th:inline="javascript">
+                let MemberModify__submitDone = false;
+
+                function MemberModify__submit(form) {
+                    if (MemberModify__submitDone) {
+                        return;
+                    }
+
+                    /*<![CDATA[*/
+                    const email = [[${member.getEmail()}]];
+                    const nickname = [[${member.getNickname()}]];
+                    /*]]>*/
+
+                    if (email == form.email.value.trim() && nickname == form.nickname.value.trim()) {
+                        warningModal("변경사항이 없습니다.");
+                        return;
+                    }
+
+                    form.email.value = form.email.value.trim();
+
+                    if (form.email.value.length == 0) {
+                        warningModal("이메일을 입력해주세요.");
+                        form.email.focus();
+
+                        return;
+                    }
+
+                    form.nickname.value = form.nickname.value.trim();
+
+                    if (nickname != form.nickname.value) {
+                        if (form.nickname.value.length == 0) {
+                            warningModal("닉네임을 입력해주세요.");
+                            form.nickname.focus();
+
+                            return;
+                        }
+                    }
+
+                    form.submit();
+                    MemberModify__submitDone = true;
+                }
+            </script>
+
+            <form th:action method="POST" class="flex flex-col gap-3" onsubmit="MemberModify__submit(this); return false;">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">아이디</span>
+                    </label>
+                    <input type="text" name="username" class="input input-bordered" th:value="${member.getUsername()}" readonly>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">이메일</span>
+                    </label>
+                    <input type="email" name="email" class="input input-bordered" th:value="${member.getEmail()}">
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">닉네임</span>
+                    </label>
+                    <input type="text" name="nickname" class="input input-bordered" th:value="${member.getNickname()}">
+                </div>
+
+                <div class="grid mt-2">
+                    <input class="btn btn-primary" type="submit" value="프로필 수정">
+                </div>
+            </form>
+        </div>
+
+    </section>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>프로필</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section section-login flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-md w-full px-2 pt-4">
+            <h1 class="font-bold text-2xl text-center mb-3">프로필</h1>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">아이디</span>
+                </label>
+                <input type="text" class="input input-bordered" th:value="${member.getUsername()}" disabled>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">이메일</span>
+                </label>
+                <input type="text" class="input input-bordered" th:value="${member.getEmail()}" disabled>
+            </div>
+
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">닉네임</span>
+                </label>
+                <input type="text" class="input input-bordered" th:value="${member.getNickname()}" disabled>
+            </div>
+
+            <div class="grid grid-cols-2 mt-2 gap-2">
+                <a href="/member/modify" class="btn btn-primary btn-outline">프로필 수정</a>
+                <a href="/member/modifyPassword" class="btn btn-secondary btn-outline">비밀번호 변경</a>
+            </div>
+        </div>
+
+    </section>
+
+</main>
+</body>
+</html>

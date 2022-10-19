@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>글 작성</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-2xl w-full px-2 pt-4">
+            <h1 class="font-bold text-2xl text-center mb-3">글 작성</h1>
+
+            <form th:action method="POST" class=" flex flex-col" onsubmit="PostWrite__submit(this); return false;">
+                <div class="form-control mb-3">
+                    <label class="label">
+                        <span class="label-text">제목</span>
+                    </label>
+                    <input type="text" name="subject" class="input input-bordered">
+                </div>
+
+                <div id="content"></div>
+                <input type="hidden" name="content">
+                <input type="hidden" name="contentHtml">
+
+                <div class="form-control mt-3">
+                    <label class="label">
+                        <span class="label-text">해시태그</span>
+                    </label>
+                    <input type="text" name="keywords" placeholder="최소 1개, 최대 10개" class="input input-bordered">
+                </div>
+
+
+                <div class="grid mt-3">
+                    <input class="btn btn-primary" type="submit" value="작성하기">
+                </div>
+            </form>
+        </div>
+
+        <script th:inline="javascript">
+            const Editor = toastui.Editor;
+
+            const content = new Editor({
+                el: document.querySelector('#content'),
+                height: '500px',
+                initialEditType: 'markdown',
+                previewStyle: 'vertical'
+            });
+
+            let PostWrite__submitDone = false;
+
+            function PostWrite__submit(form) {
+                if (PostWrite__submitDone) {
+                    return;
+                }
+
+                form.subject.value = form.subject.value.trim();
+
+                if (form.subject.value.length == 0) {
+                    warningModal("제목을 입력해주세요.");
+                    form.subject.focus();
+
+                    return;
+                }
+
+                const markdown = content.getMarkdown();
+                const html = content.getHTML();
+
+                if (markdown.trim().length == 0) {
+                    warningModal("내용을 입력해주세요.");
+
+                    return;
+                }
+
+                let contentLength = markdown.trim().length;
+
+                if (markdown.trim().length < 1000) {
+                    warningModal("최소 1000자 이상 작성해야 글을 발행할 수 있습니다. 현재 글자 수 : " + contentLength);
+
+                    return;
+                }
+
+                form.content.value = markdown;
+                form.contentHtml.value = html;
+
+                /*
+                form.keywords.value = form.keywords.value.trim();
+
+                if (form.keywords.value.length == 0) {
+                    warningModal("최소 1개의 해시태그를 입력해주세요.");
+                    form.keywords.focus();
+
+                    return;
+                }
+                */
+
+                form.submit();
+                PostWrite__submitDone = true;
+            }
+        </script>
+
+    </section>
+
+</main>
+</body>
+</html>
