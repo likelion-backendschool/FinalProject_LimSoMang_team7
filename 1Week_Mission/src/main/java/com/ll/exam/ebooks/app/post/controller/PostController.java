@@ -84,4 +84,20 @@ public class PostController {
 
         return "redirect:/";
     }
+
+    @PreAuthorize("hasAuthority('MEMBER')")
+    @GetMapping("/{id}/delete")
+    public String delete(@PathVariable long id, Principal principal) {
+        String username = principal.getName();
+
+        Member author = memberService.findByUsername(username).get();
+
+        boolean isDelete = postService.delete(author, id);
+
+        if (isDelete) {
+            return "redirect:/post/list";
+        } else {
+            return "redirect:/post/" + id;
+        }
+    }
 }
