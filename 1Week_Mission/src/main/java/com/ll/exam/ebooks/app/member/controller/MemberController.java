@@ -6,6 +6,7 @@ import com.ll.exam.ebooks.app.member.dto.request.MemberModifyPasswordRequestDto;
 import com.ll.exam.ebooks.app.member.dto.request.MemberModifyProfileRequestDto;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
+import com.ll.exam.ebooks.app.util.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,7 +44,7 @@ public class MemberController {
 
         memberService.mailSend(member, subject, message);
 
-        return "redirect:/member/login";
+        return "redirect:/member/login?msg=" + Ut.url.encode("회원가입을 축하합니다.");
     }
 
     @PreAuthorize("isAnonymous()")
@@ -128,7 +129,7 @@ public class MemberController {
     public String modify(@Valid MemberModifyProfileRequestDto modifyDto) {
         memberService.modify(modifyDto.getUsername(), modifyDto.getEmail(), modifyDto.getNickname());
 
-        return "redirect:/member/profile";
+        return "redirect:/member/profile?msg=" + Ut.url.encode("프로필을 수정했습니다.");
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -148,6 +149,6 @@ public class MemberController {
     public String modifyPassword(@Valid MemberModifyPasswordRequestDto modifyDto) {
         memberService.modifyPassword(modifyDto.getUsername(), modifyDto.getPassword());
 
-        return "redirect:/member/profile";
+        return "redirect:/member/profile?msg=" + Ut.url.encode("비밀번호를 변경했습니다.");
     }
 }

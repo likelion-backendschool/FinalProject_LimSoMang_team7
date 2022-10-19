@@ -6,6 +6,7 @@ import com.ll.exam.ebooks.app.post.dto.request.PostRequestDto;
 import com.ll.exam.ebooks.app.post.dto.response.ResponsePost;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.service.PostService;
+import com.ll.exam.ebooks.app.util.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -64,7 +65,7 @@ public class PostController {
 
         postService.save(author, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml());
 
-        return "redirect:/";
+        return "redirect:/?msg=" + Ut.url.encode("글을 등록했습니다.");
     }
 
     @PreAuthorize("hasAuthority('AUTHOR')")
@@ -82,7 +83,7 @@ public class PostController {
     public String modify(@PathVariable long id, @Valid PostRequestDto postDto) {
         postService.modify(id, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml());
 
-        return "redirect:/";
+        return "redirect:/?msg=" + Ut.url.encode("글을 수정했습니다.");
     }
 
     @PreAuthorize("hasAuthority('MEMBER')")
@@ -95,9 +96,9 @@ public class PostController {
         boolean isDelete = postService.delete(author, id);
 
         if (isDelete) {
-            return "redirect:/post/list";
+            return "redirect:/post/list?msg=" + Ut.url.encode("글을 삭제했습니다.");
         } else {
-            return "redirect:/post/" + id;
+            return "redirect:/post/" + id + "?msg=" + Ut.url.encode("회원 정보가 올바르지 않습니다.");
         }
     }
 }
