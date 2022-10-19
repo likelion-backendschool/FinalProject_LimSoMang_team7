@@ -9,7 +9,11 @@
 <main layout:fragment="main">
     <section class="section flex-grow flex flex-col items-center justify-center">
 
-        <div class="max-w-2xl w-full px-2 pt-4">
+        <div class="max-w-3xl w-full px-2 pt-4">
+            <div class="text-left">
+                <label class="btn btn-sm btn-outline" onclick="history.back()"><</label>
+            </div>
+
             <h1 class="font-bold text-2xl text-center mb-3">글 수정</h1>
 
             <form th:action method="POST" class=" flex flex-col" onsubmit="PostModify__submit(this); return false;">
@@ -43,7 +47,7 @@
 
             const content = new Editor({
                 el: document.querySelector('#content'),
-                height: '500px',
+                height: '400px',
                 initialEditType: 'markdown',
                 previewStyle: 'vertical'
             });
