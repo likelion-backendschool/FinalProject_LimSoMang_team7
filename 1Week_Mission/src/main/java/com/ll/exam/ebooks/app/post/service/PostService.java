@@ -78,4 +78,15 @@ public class PostService {
     private ResponsePost getResponsePost(Post post) {
         return postComponent.getResponsePost(post);
     }
+
+    public boolean delete(Member author, long id) {
+        Post post = postRepository.findById(id).get();
+
+        if (author.getUsername() == post.getAuthor().getUsername()) {
+            postRepository.delete(post);
+            return true;
+        }
+
+        return false;
+    }
 }
