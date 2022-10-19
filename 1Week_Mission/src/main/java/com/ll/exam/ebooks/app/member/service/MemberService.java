@@ -6,12 +6,13 @@ import com.ll.exam.ebooks.app.member.exception.DuplicateNicknameException;
 import com.ll.exam.ebooks.app.member.mail.dto.MailRequestDto;
 import com.ll.exam.ebooks.app.member.mail.service.MailService;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
+import com.ll.exam.ebooks.app.post.dto.response.ResponsePost;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service

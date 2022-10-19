@@ -36,4 +36,13 @@ public class Member extends BaseEntity {
     public Member(long id) {
         super(id);
     }
+
+    public Member toEntity() {
+        return Member.builder()
+                .id(super.getId())
+                .username(username)
+                .email(email)
+                .nickname(nickname)
+                .build();
+    }
 }

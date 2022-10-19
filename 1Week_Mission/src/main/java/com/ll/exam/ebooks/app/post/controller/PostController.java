@@ -3,6 +3,7 @@ package com.ll.exam.ebooks.app.post.controller;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.post.dto.request.PostRequestDto;
+import com.ll.exam.ebooks.app.post.dto.response.ResponsePost;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/post")
@@ -25,6 +27,17 @@ import java.security.Principal;
 public class PostController {
     private final PostService postService;
     private final MemberService memberService;
+
+
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/list")
+    public String showList(Model model) {
+        List<ResponsePost> posts = postService.list();
+
+        model.addAttribute("posts", posts);
+
+        return "post/list";
+    }
 
     @PreAuthorize("hasAuthority('AUTHOR')")
     @GetMapping("/write")

@@ -1,19 +1,24 @@
 package com.ll.exam.ebooks.app.post.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
+import com.ll.exam.ebooks.app.post.component.PostComponent;
+import com.ll.exam.ebooks.app.post.dto.response.ResponsePost;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostComponent postComponent;
 
     @Transactional
     public Post save(Member author, String subject, String content, String contentHtml) {
@@ -30,6 +35,7 @@ public class PostService {
         return post;
     }
 
+    @Transactional(readOnly = true)
     public Optional<Post> findById(long id) {
         return postRepository.findById(id);
     }
@@ -48,5 +54,18 @@ public class PostService {
         }
 
         postRepository.save(post);
+    }
+
+    public List<ResponsePost> list() {
+        List<ResponsePost> posts = postRepository.findAll()
+                .stream()
+                .map(p -> getResponsePost(p))
+                .collect(Collectors.toList());
+
+        return posts;
+    }
+
+    private ResponsePost getResponsePost(Post post) {
+        return postComponent.getResponsePost(post);
     }
 }
