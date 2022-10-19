@@ -1,8 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:mariadb://127.0.0.1:3306/eBooks_dev?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
-    username: imhope
-    password: 0987
-  jpa:
-    hibernate:
-      ddl-auto: create
