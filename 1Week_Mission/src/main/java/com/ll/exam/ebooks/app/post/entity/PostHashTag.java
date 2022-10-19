@@ -9,12 +9,9 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -23,18 +20,14 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-public class Post extends BaseEntity {
+public class PostHashTag extends BaseEntity {
+
     @ManyToOne
-    private Member author;
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    private String subject;
+    @ManyToOne
+    @JoinColumn(name = "post_keyword_id")
+    private PostKeyword postKeyword;
 
-    @Column(columnDefinition = "LONGTEXT")
-    private String content;
-
-    @Column(columnDefinition = "LONGTEXT")
-    private String contentHtml;
-
-    @OneToMany(mappedBy = "post_keyword")
-    private List<PostKeyword> postKeywords = new ArrayList<>();
 }
