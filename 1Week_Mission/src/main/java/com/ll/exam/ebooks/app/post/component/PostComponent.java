@@ -1,8 +1,8 @@
 package com.ll.exam.ebooks.app.post.component;
 
-import com.ll.exam.ebooks.app.post.dto.response.ResponseAuthor;
-import com.ll.exam.ebooks.app.post.dto.response.ResponsePost;
-import com.ll.exam.ebooks.app.post.entity.Post;
+import com.ll.exam.ebooks.app.member.dto.response.ResponseAuthor;
+import com.ll.exam.ebooks.app.member.dto.response.response.ResponsePost;
+import com.ll.exam.ebooks.app.post.dto.entity.Post;
 import org.springframework.stereotype.Component;
 
 @Component

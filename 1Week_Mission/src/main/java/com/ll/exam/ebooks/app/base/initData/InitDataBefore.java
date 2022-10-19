@@ -2,7 +2,7 @@ package com.ll.exam.ebooks.app.base.initData;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
-import com.ll.exam.ebooks.app.post.entity.Post;
+import com.ll.exam.ebooks.app.post.dto.entity.Post;
 import com.ll.exam.ebooks.app.post.service.PostService;
 
 public interface InitDataBefore {

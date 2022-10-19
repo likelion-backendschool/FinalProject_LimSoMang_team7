@@ -1,6 +1,7 @@
-package com.ll.exam.ebooks.app.post.dto.response;
+package com.ll.exam.ebooks.app.member.dto.response.response;
 
-import com.ll.exam.ebooks.app.post.entity.Post;
+import com.ll.exam.ebooks.app.member.dto.response.ResponseAuthor;
+import com.ll.exam.ebooks.app.post.dto.entity.Post;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.post.dto.response;
+package com.ll.exam.ebooks.app.member.dto.response;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
 import lombok.Builder;

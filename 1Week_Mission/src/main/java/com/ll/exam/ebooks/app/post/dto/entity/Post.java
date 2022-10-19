@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.post.entity;
+package com.ll.exam.ebooks.app.post.dto.entity;
 
 import com.ll.exam.ebooks.app.base.entity.BaseEntity;
 import com.ll.exam.ebooks.app.member.entity.Member;
