@@ -2,10 +2,10 @@ package com.ll.exam.ebooks.app.security.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
+import com.ll.exam.ebooks.app.security.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class MemberSecurityService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
@@ -37,12 +37,8 @@ public class MemberSecurityService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority("ADMIN"));
         }
 
-        if (member.getNickname() != null && member.getNickname().trim().length() > 0) {
-            authorities.add(new SimpleGrantedAuthority("AUTHOR"));
-        }
-
         authorities.add(new SimpleGrantedAuthority("MEMBER"));
 
-        return new User(member.getUsername(), member.getPassword(), authorities);
+        return new MemberContext(member, authorities);
     }
 }
