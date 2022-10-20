@@ -1,10 +1,7 @@
 package com.ll.exam.ebooks.app.member.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
-import com.ll.exam.ebooks.app.member.exception.AlreadyJoinException;
-import com.ll.exam.ebooks.app.member.exception.DuplicateNicknameException;
-import com.ll.exam.ebooks.app.member.mail.dto.MailRequestDto;
-import com.ll.exam.ebooks.app.member.mail.service.MailService;
+import com.ll.exam.ebooks.app.mail.service.MailService;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -24,40 +22,20 @@ public class MemberService {
 
     @Transactional
     public Member join(String username, String password, String email, String nickname) {
-        if (memberRepository.findByUsername(username).isPresent()) {
-            throw new AlreadyJoinException();
-        }
-
-        if (memberRepository.findByNickname(nickname).isPresent()) {
-            throw new DuplicateNicknameException();
-        }
-
-        int authLevel = 3;
-
         Member member = Member
                 .builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .email(email)
                 .nickname(nickname)
-                .authLevel(authLevel)
+                .authLevel(3)
                 .build();
 
         memberRepository.save(member);
 
+        mailService.joinMailSend(member);
+
         return member;
-    }
-
-    @Transactional
-    public void mailSend(Member member, String subject, String message) {
-        MailRequestDto mailDto = MailRequestDto
-                .builder()
-                .to(member.getEmail())
-                .subject(subject)
-                .message(message)
-                .build();
-
-        mailService.mailSend(mailDto);
     }
 
     @Transactional(readOnly = true)
@@ -76,27 +54,26 @@ public class MemberService {
     }
 
     @Transactional
-    public void setTempPassword(Member member, String tempPassword) {
+    public void setTempPassword(Member member) {
+        UUID uuid = UUID.randomUUID();
+        String tempPassword = uuid.toString().substring(0, 6);
+
         member.setPassword(passwordEncoder.encode(tempPassword));
 
         memberRepository.save(member);
+
+        mailService.tempPasswordMailSend(member, tempPassword);
     }
 
     @Transactional
     public void modify(String username, String email, String nickname) {
         Member member = memberRepository.findByUsername(username).get();
 
-        if (memberRepository.findByEmail(email).isEmpty()) {
-            member.setEmail(email);
-        }
-
-        if (memberRepository.findByNickname(nickname).isEmpty()) {
-            member.setNickname(nickname);
-        }
-
-        memberRepository.save(member);
+        member.setEmail(email);
+        member.setNickname(nickname);
     }
 
+    @Transactional
     public void modifyPassword(String username, String password) {
         Member member = memberRepository.findByUsername(username).get();
 

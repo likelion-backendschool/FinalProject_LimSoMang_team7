@@ -6,9 +6,16 @@ import com.ll.exam.ebooks.app.member.dto.request.MemberModifyPasswordRequestDto;
 import com.ll.exam.ebooks.app.member.dto.request.MemberModifyProfileRequestDto;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
+import com.ll.exam.ebooks.app.security.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
-import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -36,12 +44,7 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/join")
     public String join(@Valid MemberJoinRequestDto joinDto) {
-        Member member = memberService.join(joinDto.getUsername(), joinDto.getPassword(), joinDto.getEmail(), joinDto.getNickname());
-
-        String subject = "🦁멋북스 회원가입을 진심으로 환영합니다.";
-        String message = "멋쟁이사자처럼, 책 많이 읽고 멋쟁이 되세요. 😎";
-
-        memberService.mailSend(member, subject, message);
+        memberService.join(joinDto.getUsername(), joinDto.getPassword(), joinDto.getEmail(), joinDto.getNickname());
 
         return "redirect:/member/login";
     }
@@ -84,14 +87,7 @@ public class MemberController {
         Member member = memberService.findByUsernameAndEmail(findDto.getUsername(), findDto.getEmail()).get();
 
         if (member != null) {
-            UUID uuid = UUID.randomUUID();
-            String tempPassword = uuid.toString().substring(0, 6);
-            memberService.setTempPassword(member, tempPassword);
-
-            String subject = "🦁멋북스 " + member.getUsername() + "의 임시 비밀번호가 발급되었습니다.";
-            String message = member.getUsername() + "의 임시 비밀번호는 " + tempPassword + " 입니다.😎";
-
-            memberService.mailSend(member, subject, message);
+            memberService.setTempPassword(member);
 
             return "임시 비밀번호가 발급되었습니다. 이메일을 확인하세요.";
         } else {
@@ -101,8 +97,8 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/profile")
-    public String showProfile(Principal principal, Model model) {
-        String username = principal.getName();
+    public String showProfile(@AuthenticationPrincipal MemberContext memberContext, Model model) {
+        String username = memberContext.getName();
 
         Member member = memberService.findByUsername(username).get();
 
@@ -113,8 +109,8 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify")
-    public String showModify(Principal principal, Model model) {
-        String username = principal.getName();
+    public String showModify(@AuthenticationPrincipal MemberContext memberContext, Model model) {
+        String username = memberContext.getName();
 
         Member member = memberService.findByUsername(username).get();
 
@@ -125,16 +121,34 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify")
-    public String modify(@Valid MemberModifyProfileRequestDto modifyDto) {
+    public String modify(@AuthenticationPrincipal MemberContext memberContext, @Valid MemberModifyProfileRequestDto modifyDto) {
         memberService.modify(modifyDto.getUsername(), modifyDto.getEmail(), modifyDto.getNickname());
+
+        Member member = memberService.findByUsername(memberContext.getUsername()).get();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        memberContext.setModifyDate(member.getModifyDate());
+        memberContext.setNickname(member.getNickname());
+        memberContext.setEmail(member.getEmail());
+
+        if (memberContext.getNickname().equals("") && modifyDto.getNickname().equals(member.getNickname())) {
+            List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authentication.getAuthorities());
+            updatedAuthorities.add(new SimpleGrantedAuthority("AUTHOR"));
+            authentication = new UsernamePasswordAuthenticationToken(memberContext, member.getPassword(), updatedAuthorities);
+        } else {
+            authentication = new UsernamePasswordAuthenticationToken(memberContext, member.getPassword(), memberContext.getAuthorities());
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return "redirect:/member/profile";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modifyPassword")
-    public String showModifyPassword(Principal principal, Model model) {
-        String username = principal.getName();
+    public String showModifyPassword(@AuthenticationPrincipal MemberContext memberContext, Model model) {
+        String username = memberContext.getName();
 
         Member member = memberService.findByUsername(username).get();
 

@@ -3,6 +3,7 @@ spring:
     active: dev
     include:
       - base-addi
+      - API-KEY
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
@@ -11,18 +12,6 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: somangjuha@gmail.com
-    password: eqagmhmjdohcvruv
-    properties:
-      mail:
-        smtp:
-          starttls:
-            enable: true
-            required: true
-          auth: true
 logging:
   level:
     root: info
