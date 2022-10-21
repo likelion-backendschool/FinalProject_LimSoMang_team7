@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.post.dto.entity;
+package com.ll.exam.ebooks.app.post.entity;
 
 import com.ll.exam.ebooks.app.base.entity.BaseEntity;
 import com.ll.exam.ebooks.app.member.entity.Member;
@@ -13,6 +13,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Entity
 @Getter
 @Setter
@@ -21,8 +23,6 @@ import javax.persistence.ManyToOne;
 @SuperBuilder
 @ToString(callSuper = true)
 public class Post extends BaseEntity {
-    @ManyToOne
-    private Member author;
 
     private String subject;
 
@@ -31,4 +31,7 @@ public class Post extends BaseEntity {
 
     @Column(columnDefinition = "LONGTEXT")
     private String contentHtml;
+
+    @ManyToOne(fetch = LAZY)
+    private Member author;
 }

@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.post.dto.request;
+package com.ll.exam.ebooks.app.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @AllArgsConstructor
-public class PostRequestDto {
+public class PostForm {
     @NotEmpty
     private String subject;
 
@@ -17,5 +17,6 @@ public class PostRequestDto {
     @NotEmpty
     private String contentHtml;
 
-    private String keywords;
+    @NotEmpty
+    private String Tags;
 }
