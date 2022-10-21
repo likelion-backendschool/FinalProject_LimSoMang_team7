@@ -16,14 +16,38 @@ toastr.options = {
     hideMethod: "fadeOut"
 };
 
+function parseMsg(msg) {
+    const [pureMsg, ttl] = msg.split(";ttl=");
+
+    const currentJsUnixTimestamp = new Date().getTime();
+
+    if ( ttl && parseInt(ttl) + 5000 < currentJsUnixTimestamp ) {
+        return [pureMsg, false];
+    }
+
+    return [pureMsg, true];
+}
+
 function successModal(msg) {
-    toastr["success"](msg);
+    const [pureMsg, needToShow] = parseMsg(msg);
+
+    if ( needToShow ) {
+        toastr["success"](pureMsg);
+    }
 }
 
 function errorModal(msg) {
-    toastr["error"](msg);
+    const [pureMsg, needToShow] = parseMsg(msg);
+
+    if ( needToShow ) {
+        toastr["error"](pureMsg);
+    }
 }
 
 function warningModal(msg) {
-    toastr["warning"](msg);
+    const [pureMsg, needToShow] = parseMsg(msg);
+
+    if ( needToShow ) {
+        toastr["warning"](pureMsg);
+    }
 }

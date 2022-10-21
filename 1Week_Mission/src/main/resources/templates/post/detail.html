@@ -12,18 +12,16 @@
         <div class="max-w-2xl w-full px-2 pt-4">
             <h1 class="font-bold text-2xl text-center mb-3">글 상세화면</h1>
 
-            <div class="form-control mb-3">
+            <div class="form-control mb-4">
                 <label class="label">
                     <span class="label-text">제목</span>
                 </label>
                 <input type="text" name="subject" class="input input-bordered" th:value="${post.subject}" disabled>
             </div>
 
-            <div class="form-control mb-3">
-                <label class="label">
-                    <span class="label-text">내용</span>
-                </label>
-                <div id="content"></div>
+            <div class="toast-ui-viewer">
+                <div class="toastui-editor-contents" style="overflow-wrap: break-word;"
+                     th:utext="${post.contentHtml}"></div>
             </div>
 
             <div class="form-control mt-3">
@@ -35,22 +33,9 @@
 
         </div>
 
-        <script th:inline="javascript">
-            const Editor = toastui.Editor.factory;
-
-            /*<![CDATA[*/
-            const contentMarkdown = [[${post.getContent()}]];
-            /*]]>*/
-
-            const content = new Editor({
-                el: document.querySelector('#content'),
-                height: '500px',
-                viewer: true,
-                initialValue: contentMarkdown
-            });
-        </script>
-
     </section>
+
+    <th:block th:replace="fragment/toastEditor :: toastEditor"></th:block>
 
 </main>
 </body>

@@ -10,3 +10,32 @@ html > body {
     text-underline-position: under;
     color: #444;
 }
+
+html>body,
+html>body .ProseMirror,
+html>body .toastui-editor-contents,
+html>body code[class*="language-"],
+html>body pre[class*="language-"],
+html>body code[class*="lang-"],
+html>body pre[class*="lang-"] {
+    font-family: "Pretendard-Regular";
+    text-underline-position: under;
+    letter-spacing: 0;
+}
+
+html>body code[class*="language-"],
+html>body pre[class*="language-"],
+html>body code[class*="lang-"],
+html>body pre[class*="lang-"] {
+    color: white;
+    background-color: #444;
+}
+
+html>body .ProseMirror,
+html>body .toastui-editor-contents {
+    font-size: 1.1rem;
+}
+
+.toastui-editor-dark {
+    background-color: #333;
+}
