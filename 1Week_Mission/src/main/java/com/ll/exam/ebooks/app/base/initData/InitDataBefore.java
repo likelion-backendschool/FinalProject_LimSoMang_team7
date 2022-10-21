@@ -11,8 +11,8 @@ public interface InitDataBefore {
         Member member2 = memberService.join("user2", "1234", "user2@test.com", "해찬");
         Member member3 = memberService.join("user3", "1234", "user3@test.com", "마크");
 
-        Post post1 = postService.save(member1, "test1", "## test1", "<h2>test1</h2>");
-        Post post2 = postService.save(member2, "test2", "## test2", "<h2>test2</h2>");
-        Post post3 = postService.save(member3, "test3", "## test3", "<h2>test3</h2>");
+        Post post1 = postService.write(member1, "test1", "## test1", "<h2>test1</h2>", "#test #user1");
+        Post post2 = postService.write(member2, "test2", "## test2", "<h2>test2</h2>", "#test #user2");
+        Post post3 = postService.write(member3, "test3", "## test3", "<h2>test3</h2>", "#test #user3");
     }
 }
