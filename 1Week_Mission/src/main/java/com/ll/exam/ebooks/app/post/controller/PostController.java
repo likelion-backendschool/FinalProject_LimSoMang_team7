@@ -1,14 +1,16 @@
 package com.ll.exam.ebooks.app.post.controller;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
-import com.ll.exam.ebooks.app.member.service.MemberService;
-import com.ll.exam.ebooks.app.post.dto.request.PostRequestDto;
-import com.ll.exam.ebooks.app.member.dto.response.response.ResponsePost;
-import com.ll.exam.ebooks.app.post.dto.entity.Post;
+import com.ll.exam.ebooks.app.post.dto.PostForm;
+import com.ll.exam.ebooks.app.post.dto.ResponsePost;
+import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.service.PostService;
+import com.ll.exam.ebooks.app.security.dto.MemberContext;
+import com.ll.exam.ebooks.app.util.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -26,7 +27,6 @@ import java.util.List;
 @Slf4j
 public class PostController {
     private final PostService postService;
-    private final MemberService memberService;
 
 
     @PreAuthorize("permitAll()")
@@ -49,37 +49,41 @@ public class PostController {
         return "post/detail";
     }
 
-    @PreAuthorize("hasAuthority('AUTHOR')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/write")
-    public String showWrite() {
-        return "/post/write";
+    public String showWrite(@AuthenticationPrincipal MemberContext memberContext) {
+        if (memberContext.getNickname().trim().length() > 0) {
+            return "/post/write";
+        }
+
+        return "redirect:/?msg=" + Ut.url.encode("마이페이지에서 닉네임을 입력해주세요.");
     }
 
-    @PreAuthorize("hasAuthority('AUTHOR')")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/write")
-    public String write(@Valid PostRequestDto postDto, Principal principal) {
-        String username = principal.getName();
+    public String write(@Valid PostForm postDto, @AuthenticationPrincipal MemberContext memberContext) {
+        Member author = memberContext.getMember();
 
-        Member author = memberService.findByUsername(username).get();
+        log.debug("postDto : " + postDto);
 
-        postService.save(author, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml());
+        postService.write(author, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml(), postDto.getTags());
 
         return "redirect:/";
     }
 
-    @PreAuthorize("hasAuthority('AUTHOR')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}/modify")
     public String showModify(@PathVariable long id, Model model) {
-        Post post = postService.findById(id).get();
+        Post post = postService.findById(id);
 
         model.addAttribute("post", post);
 
         return "/post/modify";
     }
 
-    @PreAuthorize("hasAuthority('AUTHOR')")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/modify")
-    public String modify(@PathVariable long id, @Valid PostRequestDto postDto) {
+    public String modify(@PathVariable long id, @Valid PostForm postDto) {
         postService.modify(id, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml());
 
         return "redirect:/";

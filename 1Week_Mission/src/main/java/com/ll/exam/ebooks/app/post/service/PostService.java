@@ -2,15 +2,17 @@ package com.ll.exam.ebooks.app.post.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.post.component.PostComponent;
-import com.ll.exam.ebooks.app.member.dto.response.response.ResponsePost;
-import com.ll.exam.ebooks.app.post.dto.entity.Post;
+import com.ll.exam.ebooks.app.post.dto.ResponsePost;
+import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.repository.PostRepository;
+import com.ll.exam.ebooks.app.postKeyword.service.PostKeywordService;
+import com.ll.exam.ebooks.app.postTag.service.PostTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,9 +21,10 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final PostComponent postComponent;
+    private final PostTagService postTagService;
 
     @Transactional
-    public Post save(Member author, String subject, String content, String contentHtml) {
+    public Post write(Member author, String subject, String content, String contentHtml, String postTags) {
         Post post = Post
                 .builder()
                 .author(author)
@@ -32,17 +35,24 @@ public class PostService {
 
         postRepository.save(post);
 
+        applyPostTags(post, postTags);
+
         return post;
     }
 
+    public void applyPostTags(Post post, String postTags) {
+        postTagService.applyPostTags(post, postTags);
+    }
+
     @Transactional(readOnly = true)
-    public Optional<Post> findById(long id) {
-        return postRepository.findById(id);
+    public Post findById(long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("글이 존재하지 않습니다."));
     }
 
     @Transactional
     public void modify(long id, String subject, String content, String contentHtml) {
-        Post post = postRepository.findById(id).get();
+        Post post = findById(id);
 
         if (!post.getSubject().equals(subject)) {
             post.setSubject(subject);
@@ -66,9 +76,9 @@ public class PostService {
         return posts;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponsePost findOne(long id) {
-        Post post = postRepository.findById(id).get();
+        Post post = findById(id);
 
         ResponsePost responsePost = getResponsePost(post);
 
