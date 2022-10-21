@@ -80,7 +80,7 @@
                     프로필
                 </span>
             </a>
-            <a href="/post/write" class="inline-flex" sec:authorize="hasAuthority('AUTHOR')">
+            <a href="/post/write" class="inline-flex" sec:authorize="isAuthenticated()">
                 <i class="fa-solid fa-pen-nib"></i>
                 <span class="ml-[2px] hidden sm:block">
                     글 작성

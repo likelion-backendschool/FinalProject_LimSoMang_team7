@@ -65,13 +65,9 @@ public class MemberController {
     @PostMapping("/findUsername")
     @ResponseBody
     public String findUsername(@Valid MemberFindRequestDto findDto) {
-        Member member = memberService.findByEmail(findDto.getEmail()).get();
+        Member member = memberService.findByEmail(findDto.getEmail());
 
-        if (member != null) {
-            return member.getUsername();
-        } else {
-            return "가입되지 않은 이메일입니다.";
-        }
+        return member.getUsername();
     }
 
     @PreAuthorize("isAnonymous()")
@@ -84,23 +80,17 @@ public class MemberController {
     @PostMapping("/findPassword")
     @ResponseBody
     public String findPassword(@Valid MemberFindRequestDto findDto) {
-        Member member = memberService.findByUsernameAndEmail(findDto.getUsername(), findDto.getEmail()).get();
+        Member member = memberService.findByUsernameAndEmail(findDto.getUsername(), findDto.getEmail());
 
-        if (member != null) {
-            memberService.setTempPassword(member);
+        memberService.setTempPassword(member);
 
-            return "임시 비밀번호가 발급되었습니다. 이메일을 확인하세요.";
-        } else {
-            return "입력하신 정보가 올바르지 않습니다.";
-        }
+        return "임시 비밀번호가 발급되었습니다. 이메일을 확인하세요.";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/profile")
     public String showProfile(@AuthenticationPrincipal MemberContext memberContext, Model model) {
-        String username = memberContext.getName();
-
-        Member member = memberService.findByUsername(username).get();
+        Member member = memberContext.getMember();
 
         model.addAttribute("member", member);
 
@@ -112,7 +102,7 @@ public class MemberController {
     public String showModify(@AuthenticationPrincipal MemberContext memberContext, Model model) {
         String username = memberContext.getName();
 
-        Member member = memberService.findByUsername(username).get();
+        Member member = memberService.findByUsername(username);
 
         model.addAttribute("member", member);
 
@@ -124,22 +114,13 @@ public class MemberController {
     public String modify(@AuthenticationPrincipal MemberContext memberContext, @Valid MemberModifyProfileRequestDto modifyDto) {
         memberService.modify(modifyDto.getUsername(), modifyDto.getEmail(), modifyDto.getNickname());
 
-        Member member = memberService.findByUsername(memberContext.getUsername()).get();
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberService.findByUsername(memberContext.getUsername());
 
         memberContext.setModifyDate(member.getModifyDate());
         memberContext.setNickname(member.getNickname());
         memberContext.setEmail(member.getEmail());
 
-        if (memberContext.getNickname().equals("") && modifyDto.getNickname().equals(member.getNickname())) {
-            List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authentication.getAuthorities());
-            updatedAuthorities.add(new SimpleGrantedAuthority("AUTHOR"));
-            authentication = new UsernamePasswordAuthenticationToken(memberContext, member.getPassword(), updatedAuthorities);
-        } else {
-            authentication = new UsernamePasswordAuthenticationToken(memberContext, member.getPassword(), memberContext.getAuthorities());
-        }
-
+        Authentication authentication = new UsernamePasswordAuthenticationToken(memberContext, member.getPassword(), memberContext.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return "redirect:/member/profile";
@@ -150,7 +131,7 @@ public class MemberController {
     public String showModifyPassword(@AuthenticationPrincipal MemberContext memberContext, Model model) {
         String username = memberContext.getName();
 
-        Member member = memberService.findByUsername(username).get();
+        Member member = memberService.findByUsername(username);
 
         model.addAttribute("member", member);
 
