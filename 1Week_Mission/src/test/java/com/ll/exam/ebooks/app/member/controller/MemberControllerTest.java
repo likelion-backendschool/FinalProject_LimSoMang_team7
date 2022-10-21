@@ -76,7 +76,7 @@ public class MemberControllerTest {
                 .andExpect(handler().methodName("join"))
                 .andExpect(redirectedUrl("/member/login"));
 
-        assertThat(memberService.findByUsername("user100").isPresent()).isTrue();
+        assertThat(memberService.findByUsername("user100")).isNotNull();
     }
 
     @Test
@@ -129,7 +129,7 @@ public class MemberControllerTest {
                 .andExpect(handler().methodName("findUsername"))
                 .andExpect(content().string(containsString("user1")));
 
-        assertThat(memberService.findByEmail("user1@test.com").get().getUsername()).isEqualTo("user1");
+        assertThat(memberService.findByEmail("user1@test.com").getUsername()).isEqualTo("user1");
     }
 
     @Test
@@ -167,7 +167,7 @@ public class MemberControllerTest {
                 .andExpect(handler().methodName("findPassword"))
                 .andExpect(redirectedUrl("/member/login"));
 
-        assertThat(memberService.findByUsername("user1").isPresent()).isTrue();
+        assertThat(memberService.findByUsername("user1")).isNotNull();
     }
 
     @Test
@@ -223,7 +223,7 @@ public class MemberControllerTest {
                 .andExpect(handler().methodName("modify"))
                 .andExpect(redirectedUrl("/member/profile"));
 
-        assertThat(memberService.findByUsername("user1").get().getNickname()).isEqualTo("JENO");
+        assertThat(memberService.findByUsername("user1").getNickname()).isEqualTo("JENO");
     }
 
     @Test
@@ -262,7 +262,7 @@ public class MemberControllerTest {
                 .andExpect(handler().methodName("modifyPassword"))
                 .andExpect(redirectedUrl("/member/profile"));
 
-        assertThat(passwordEncoder.matches("5678", memberService.findByUsername("user1").get().getPassword())).isTrue();
+        assertThat(passwordEncoder.matches("5678", memberService.findByUsername("user1").getPassword())).isTrue();
     }
 
 }

@@ -1,9 +1,7 @@
 package com.ll.exam.ebooks.app.member.controller;
 
-import com.ll.exam.ebooks.app.member.dto.request.MemberFindRequestDto;
-import com.ll.exam.ebooks.app.member.dto.request.MemberJoinRequestDto;
-import com.ll.exam.ebooks.app.member.dto.request.MemberModifyPasswordRequestDto;
-import com.ll.exam.ebooks.app.member.dto.request.MemberModifyProfileRequestDto;
+import com.ll.exam.ebooks.app.member.dto.ModifyForm;
+import com.ll.exam.ebooks.app.member.dto.JoinForm;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.security.dto.MemberContext;
@@ -12,9 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,9 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/member")
@@ -43,7 +36,7 @@ public class MemberController {
 
     @PreAuthorize("isAnonymous()")
     @PostMapping("/join")
-    public String join(@Valid MemberJoinRequestDto joinDto) {
+    public String join(@Valid JoinForm joinDto) {
         memberService.join(joinDto.getUsername(), joinDto.getPassword(), joinDto.getEmail(), joinDto.getNickname());
 
         return "redirect:/member/login";
@@ -64,8 +57,8 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/findUsername")
     @ResponseBody
-    public String findUsername(@Valid MemberFindRequestDto findDto) {
-        Member member = memberService.findByEmail(findDto.getEmail());
+    public String findUsername(@Valid ModifyForm modifyForm) {
+        Member member = memberService.findByEmail(modifyForm.getEmail());
 
         return member.getUsername();
     }
@@ -79,8 +72,8 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/findPassword")
     @ResponseBody
-    public String findPassword(@Valid MemberFindRequestDto findDto) {
-        Member member = memberService.findByUsernameAndEmail(findDto.getUsername(), findDto.getEmail());
+    public String findPassword(@Valid ModifyForm modifyForm) {
+        Member member = memberService.findByUsernameAndEmail(modifyForm.getUsername(), modifyForm.getEmail());
 
         memberService.setTempPassword(member);
 
@@ -111,8 +104,8 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify")
-    public String modify(@AuthenticationPrincipal MemberContext memberContext, @Valid MemberModifyProfileRequestDto modifyDto) {
-        memberService.modify(modifyDto.getUsername(), modifyDto.getEmail(), modifyDto.getNickname());
+    public String modify(@AuthenticationPrincipal MemberContext memberContext, @Valid ModifyForm modifyForm) {
+        memberService.modify(modifyForm.getUsername(), modifyForm.getEmail(), modifyForm.getNickname());
 
         Member member = memberService.findByUsername(memberContext.getUsername());
 
@@ -140,8 +133,8 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modifyPassword")
-    public String modifyPassword(@Valid MemberModifyPasswordRequestDto modifyDto) {
-        memberService.modifyPassword(modifyDto.getUsername(), modifyDto.getPassword());
+    public String modifyPassword(@AuthenticationPrincipal MemberContext memberContext, String password) {
+        memberService.modifyPassword(memberContext.getUsername(), password);
 
         return "redirect:/member/profile";
     }

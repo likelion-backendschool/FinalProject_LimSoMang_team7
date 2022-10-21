@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.member.dto.request;
+package com.ll.exam.ebooks.app.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,12 +7,11 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @AllArgsConstructor
-public class MemberModifyProfileRequestDto {
-    @NotEmpty
+public class ModifyForm {
     private String username;
+
+    private String nickname;
 
     @NotEmpty
     private String email;
-
-    private String nickname;
 }

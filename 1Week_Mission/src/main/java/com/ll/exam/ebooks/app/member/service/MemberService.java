@@ -2,8 +2,10 @@ package com.ll.exam.ebooks.app.member.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.mail.service.MailService;
+import com.ll.exam.ebooks.app.member.exception.MemberNotFoundException;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,18 +41,21 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Member> findByEmail(String email) {
-        return memberRepository.findByEmail(email);
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberNotFoundException("정보에 맞는 회원이 존재하지 않습니다."));
     }
 
     @Transactional(readOnly = true)
-    public Optional<Member> findByUsernameAndEmail(String username, String email) {
-        return memberRepository.findByUsernameAndEmail(username, email);
+    public Member findByUsernameAndEmail(String username, String email) {
+        return memberRepository.findByUsernameAndEmail(username, email)
+                .orElseThrow(() -> new MemberNotFoundException("정보에 맞는 회원이 존재하지 않습니다."));
     }
 
     @Transactional(readOnly = true)
-    public Optional<Member> findByUsername(String username) {
-        return memberRepository.findByUsername(username);
+    public Member findByUsername(String username) {
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberNotFoundException("회원이 존재하지 않습니다."));
     }
 
     @Transactional
@@ -67,7 +72,8 @@ public class MemberService {
 
     @Transactional
     public void modify(String username, String email, String nickname) {
-        Member member = memberRepository.findByUsername(username).get();
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberNotFoundException("회원이 존재하지 않습니다."));
 
         member.setEmail(email);
         member.setNickname(nickname);
@@ -75,10 +81,11 @@ public class MemberService {
 
     @Transactional
     public void modifyPassword(String username, String password) {
-        Member member = memberRepository.findByUsername(username).get();
+        Member member = memberRepository.findByUsername(username).orElse(null);
 
-        member.setPassword(passwordEncoder.encode(password));
-
-        memberRepository.save(member);
+        if (member != null) {
+            member.setPassword(passwordEncoder.encode(password));
+            memberRepository.save(member);
+        }
     }
 }
