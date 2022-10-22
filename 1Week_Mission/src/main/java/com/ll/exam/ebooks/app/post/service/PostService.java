@@ -80,6 +80,10 @@ public class PostService {
     @Transactional
     public void delete(Post post) {
         postRepository.delete(post);
+
+        if (post.getHashTags() != null) {
+            postHashTagService.delete(post);
+        }
     }
 
     // 글 수정 권한 여부 체크(권한: 글쓴이 본인)

@@ -83,4 +83,11 @@ public class PostHashTagService {
     public List<PostHashTag> findByPostId(Long postId) {
         return postHashTagRepository.findAllByPostId(postId);
     }
+
+    public void delete(Post post) {
+        List<PostHashTag> postHashTags = postHashTagRepository.findAllByPostId(post.getId());
+
+        postHashTags.stream()
+                .forEach(p -> postHashTagRepository.delete(p));
+    }
 }
