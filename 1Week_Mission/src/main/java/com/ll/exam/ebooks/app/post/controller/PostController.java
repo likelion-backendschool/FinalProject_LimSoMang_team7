@@ -1,22 +1,22 @@
 package com.ll.exam.ebooks.app.post.controller;
 
+import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.post.dto.PostForm;
-import com.ll.exam.ebooks.app.post.dto.ResponsePost;
 import com.ll.exam.ebooks.app.post.entity.Post;
+import com.ll.exam.ebooks.app.post.exception.ActorCanNotModifyException;
 import com.ll.exam.ebooks.app.post.service.PostService;
-import com.ll.exam.ebooks.app.security.dto.MemberContext;
-import com.ll.exam.ebooks.app.util.Ut;
+import com.ll.exam.ebooks.app.postHashTag.service.PostHashTagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -27,64 +27,113 @@ import java.util.List;
 @Slf4j
 public class PostController {
     private final PostService postService;
+    private final PostHashTagService postHashTagService;
+    private final Rq rq;
 
 
-    @PreAuthorize("permitAll()")
-    @GetMapping("/list")
-    public String showList(Model model) {
-        List<ResponsePost> posts = postService.list();
+    // 글 작성폼
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/write")
+    public String showWrite() {
+        Member member = rq.getMember();
+        log.debug("member : " + member);
+        if (member.getNickname() == null || member.getNickname().equals("")) {
+            return "redirect:/member/beAuthor";
+        }
 
-        model.addAttribute("posts", posts);
-
-        return "post/list";
+        return "/post/write";
     }
 
-    @PreAuthorize("permitAll()")
+    // 글 작성
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/write")
+    public String write(@Valid PostForm postForm) {
+        Member author = rq.getMember();
+
+        Post post = postService.write(author, postForm);
+
+        return "redirect:/post/%d".formatted(post.getId());
+    }
+
+    // 내 글 상세 조회
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public String showDetail(@PathVariable long id, Model model) {
-        ResponsePost post = postService.findOne(id);
+        Member member = rq.getMember();
+        Post post = postService.findById(id);
+
+        post.setHashTags(postHashTagService.findByPostId(id));
+
+        log.debug("post : " + post);
+        // 조회 권한 검사
+        if (postService.canSelect(member, post) == false) {
+            throw new ActorCanNotModifyException();
+        }
 
         model.addAttribute("post", post);
 
         return "post/detail";
     }
 
+    // 내 글 리스트 조회
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/write")
-    public String showWrite(@AuthenticationPrincipal MemberContext memberContext) {
-        if (memberContext.getNickname().trim().length() > 0) {
-            return "/post/write";
-        }
+    @GetMapping("/list")
+    public String showList(@RequestParam(defaultValue = "hashTag") String kwType,
+                           @RequestParam(defaultValue = "") String kw,
+                           Model model) {
+        Member author = rq.getMember();
 
-        return "redirect:/?msg=" + Ut.url.encode("마이페이지에서 닉네임을 입력해주세요.");
+        List<Post> posts = postService.search(author, kwType, kw);
+
+        model.addAttribute("posts", posts);
+
+        return "post/list";
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/write")
-    public String write(@Valid PostForm postDto, @AuthenticationPrincipal MemberContext memberContext) {
-        Member author = memberContext.getMember();
-
-        log.debug("postDto : " + postDto);
-
-        postService.write(author, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml(), postDto.getTags());
-
-        return "redirect:/";
-    }
-
+    // 글 수정폼
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}/modify")
     public String showModify(@PathVariable long id, Model model) {
+        Member member = rq.getMember();
         Post post = postService.findById(id);
 
+        // 수정 권한 검사
+        if (!postService.canModify(member, post)) {
+            throw new ActorCanNotModifyException();
+        }
         model.addAttribute("post", post);
 
-        return "/post/modify";
+        return "post/modify";
     }
 
+    // 글 수정
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/modify")
-    public String modify(@PathVariable long id, @Valid PostForm postDto) {
-        postService.modify(id, postDto.getSubject(), postDto.getContent(), postDto.getContentHtml());
+    public String modify(@PathVariable long id,
+                         @Valid PostForm postForm) {
+        Member member = rq.getMember();
+        Post post = postService.findById(id);
+
+        // 수정 권한 검사
+        if (!postService.canModify(member, post)) {
+            throw new ActorCanNotModifyException();
+        }
+        postService.modify(post, postForm);
+
+        return "redirect:/post/%d".formatted(post.getId());
+    }
+
+    // 글 삭제 구현
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}/delete")
+    public String delete(@PathVariable long id) {
+        Member member = rq.getMember();
+        Post post = postService.findById(id);
+
+        if (!postService.canDelete(member, post)) {
+            throw new ActorCanNotModifyException();
+        }
+        postService.delete(post);
 
         return "redirect:/";
     }

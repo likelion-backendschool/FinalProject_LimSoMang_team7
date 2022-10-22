@@ -43,15 +43,6 @@
                         return;
                     }
 
-                    let contentLength = markdown.length;
-
-                    if (markdown.length < 1000) {
-                        warningModal("최소 1000자 이상 작성해야 글을 발행할 수 있습니다. 현재 글자 수 : " + contentLength);
-
-                        return;
-                    }
-
-                    /*
                     form.keywords.value = form.keywords.value.trim();
 
                     if (form.keywords.value.length == 0) {
@@ -60,7 +51,6 @@
 
                         return;
                     }
-                    */
 
                     form.submit();
                     PostModify__submitDone = true;
@@ -91,12 +81,13 @@
                     <label class="label">
                         <span class="label-text">해시태그</span>
                     </label>
-                    <input type="text" name="keywords" placeholder="최소 1개, 최대 10개" class="input input-bordered">
+                    <input type="text" name="hashTags" placeholder="#태그입력" class="input input-bordered"
+                           th:value="${post.hashTagString}">
                 </div>
 
 
                 <div class="grid mt-3">
-                    <input class="btn btn-primary" type="submit" value="작성하기">
+                    <input class="btn btn-primary" type="submit" value="수정하기">
                 </div>
             </form>
         </div>

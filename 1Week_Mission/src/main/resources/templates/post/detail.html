@@ -19,16 +19,23 @@
                 <input type="text" name="subject" class="input input-bordered" th:value="${post.subject}" disabled>
             </div>
 
-            <div class="toast-ui-viewer">
+            <div class="mt-3 inline">
+                <label class="label">
+                    <span class="label-text">해시태그</span>
+                </label>
+                <span th:each="tag : ${post.hashTags}" class="mr-2">
+                    <button class="postTag btn btn-xs btn-secondary" th:text="|#${tag.postKeyword.content}|"/>
+                </span>
+            </div>
+
+            <div class="my-4 toast-ui-viewer">
                 <div class="toastui-editor-contents" style="overflow-wrap: break-word;"
                      th:utext="${post.contentHtml}"></div>
             </div>
 
-            <div class="form-control mt-3">
-                <label class="label">
-                    <span class="label-text">해시태그</span>
-                </label>
-                <input type="text" name="keywords" class="input input-bordered" disabled>
+            <div th:if="${post.getAuthor().username} == ${#authentication.principal.username}" class="text-right">
+                <a th:href="|/post/${post.id}/modify|" class="btn btn-outline btn-sm">수정</a>
+                <a th:onclick="return confirm('[[${post.id}]]번 글을 삭제하겠습니까?')" th:href="|/post/${post.id}/delete|" class="btn btn-outline btn-sm">삭제</a>
             </div>
 
         </div>
