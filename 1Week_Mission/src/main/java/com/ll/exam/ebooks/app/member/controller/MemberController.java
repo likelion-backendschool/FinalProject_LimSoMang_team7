@@ -1,19 +1,16 @@
 package com.ll.exam.ebooks.app.member.controller;
 
-import com.ll.exam.ebooks.app.member.dto.ModifyForm;
-import com.ll.exam.ebooks.app.member.dto.JoinForm;
+import com.ll.exam.ebooks.app.base.rq.Rq;
+import com.ll.exam.ebooks.app.member.form.JoinForm;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
-import com.ll.exam.ebooks.app.security.dto.MemberContext;
+import com.ll.exam.ebooks.app.util.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,25 +24,48 @@ import javax.validation.Valid;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
+    private final Rq rq;
 
-    @PreAuthorize("isAnonymous()")
-    @GetMapping("/join")
-    public String showJoin() {
-        return "member/join";
-    }
-
-    @PreAuthorize("isAnonymous()")
-    @PostMapping("/join")
-    public String join(@Valid JoinForm joinDto) {
-        memberService.join(joinDto.getUsername(), joinDto.getPassword(), joinDto.getEmail(), joinDto.getNickname());
-
-        return "redirect:/member/login";
-    }
-
+    // 로그인 폼
     @PreAuthorize("isAnonymous()")
     @GetMapping("/login")
     public String showLogin() {
         return "member/login";
+    }
+
+    // 회원가입 폼
+    @PreAuthorize("isAnonymous()")
+    @GetMapping("/join")
+    public String showJoin(JoinForm joinForm) {
+        return "member/join";
+    }
+
+    // 회원가입
+    @PreAuthorize("isAnonymous()")
+    @PostMapping("/join")
+    public String join(@Valid JoinForm joinForm, BindingResult bindingResult) {
+        // 아이디 중복 검사
+        Member oldMember = memberService.findByUsername(joinForm.getUsername());
+        if (oldMember != null) {
+            bindingResult.rejectValue("username", "duplicated username", "중복된 아이디입니다.");
+            return "member/join";
+        }
+
+        if (!joinForm.getPassword().equals(joinForm.getPasswordConfirm())) {
+            bindingResult.rejectValue("password", "no matched password", "비밀번호가 일치하지 않습니다.");
+            return "member/join";
+        }
+
+        // 이메일 중복 검사
+        oldMember = memberService.findByEmail(joinForm.getEmail());
+        if (oldMember != null) {
+            bindingResult.rejectValue("email", "duplicated email", "중복된 이메일입니다.");
+            return "member/join";
+        }
+
+        memberService.join(joinForm);
+
+        return "/member/login";
     }
 
     @PreAuthorize("isAnonymous()")
@@ -57,8 +77,12 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/findUsername")
     @ResponseBody
-    public String findUsername(@Valid ModifyForm modifyForm) {
-        Member member = memberService.findByEmail(modifyForm.getEmail());
+    public String findUsername(String email) {
+        Member member = memberService.findByEmail(email);
+
+        if (member == null) {
+            return "일치하는 회원이 존재하지 않습니다.";
+        }
 
         return member.getUsername();
     }
@@ -72,18 +96,22 @@ public class MemberController {
     @PreAuthorize("isAnonymous()")
     @PostMapping("/findPassword")
     @ResponseBody
-    public String findPassword(@Valid ModifyForm modifyForm) {
-        Member member = memberService.findByUsernameAndEmail(modifyForm.getUsername(), modifyForm.getEmail());
+    public String findPassword(String username, String email) {
+        Member member = memberService.findByUsernameAndEmail(username, email);
+
+        if (member == null) {
+            return "일치하는 회원이 존재하지 않습니다.";
+        }
 
         memberService.setTempPassword(member);
 
-        return "임시 비밀번호가 발급되었습니다. 이메일을 확인하세요.";
+        return "해당 이메일로 '%s' 계정의 임시 비밀번호를 발송했습니다.".formatted(member.getUsername());
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/profile")
-    public String showProfile(@AuthenticationPrincipal MemberContext memberContext, Model model) {
-        Member member = memberContext.getMember();
+    public String showProfile(Model model) {
+        Member member = rq.getMember();
 
         model.addAttribute("member", member);
 
@@ -91,40 +119,9 @@ public class MemberController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/modify")
-    public String showModify(@AuthenticationPrincipal MemberContext memberContext, Model model) {
-        String username = memberContext.getName();
-
-        Member member = memberService.findByUsername(username);
-
-        model.addAttribute("member", member);
-
-        return "member/modify";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/modify")
-    public String modify(@AuthenticationPrincipal MemberContext memberContext, @Valid ModifyForm modifyForm) {
-        memberService.modify(modifyForm.getUsername(), modifyForm.getEmail(), modifyForm.getNickname());
-
-        Member member = memberService.findByUsername(memberContext.getUsername());
-
-        memberContext.setModifyDate(member.getModifyDate());
-        memberContext.setNickname(member.getNickname());
-        memberContext.setEmail(member.getEmail());
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(memberContext, member.getPassword(), memberContext.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return "redirect:/member/profile";
-    }
-
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/modifyPassword")
-    public String showModifyPassword(@AuthenticationPrincipal MemberContext memberContext, Model model) {
-        String username = memberContext.getName();
-
-        Member member = memberService.findByUsername(username);
+    public String showModifyPassword(Model model) {
+        Member member = rq.getMember();
 
         model.addAttribute("member", member);
 
@@ -133,8 +130,33 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modifyPassword")
-    public String modifyPassword(@AuthenticationPrincipal MemberContext memberContext, String password) {
-        memberService.modifyPassword(memberContext.getUsername(), password);
+    public String modifyPassword(String oldPassword, String password) {
+        Member member = rq.getMember();
+        boolean isModify = memberService.modifyPassword(member, oldPassword, password);
+
+        if (!isModify) {
+            return rq.historyBack("비밀번호 변경에 실패했습니다.");
+        }
+
+        return "redirect:/member/profile";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/beAuthor")
+    public String showBeAuthor() {
+        return "member/beAuthor";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/beAuthor")
+    public String beAuthor(String nickname) {
+        Member member = rq.getMember();
+
+        boolean isAuthor = memberService.beAuthor(member, nickname);
+
+        if (!isAuthor) {
+            return "redirect:/member/beAuthor?errorMsg=" + Ut.url.encode("이미 사용 중인 닉네임입니다.");
+        }
 
         return "redirect:/member/profile";
     }

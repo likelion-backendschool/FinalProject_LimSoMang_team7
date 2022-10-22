@@ -16,27 +16,34 @@
                 <label class="label">
                     <span class="label-text">아이디</span>
                 </label>
-                <input type="text" class="input input-bordered" th:value="${member.getUsername()}" disabled>
+                <input type="text" class="input input-bordered" th:value="${member.username}" disabled>
             </div>
 
             <div class="form-control">
                 <label class="label">
                     <span class="label-text">이메일</span>
                 </label>
-                <input type="text" class="input input-bordered" th:value="${member.getEmail()}" disabled>
+                <input type="text" class="input input-bordered" th:value="${member.email}" disabled>
             </div>
 
             <div class="form-control">
                 <label class="label">
-                    <span class="label-text">닉네임</span>
+                    <span class="label-text">필명</span>
                 </label>
-                <input type="text" class="input input-bordered" th:value="${member.getNickname()}" disabled>
+                <input type="text" class="input input-bordered" th:value="${member.nickname}" disabled>
             </div>
 
-            <div class="grid grid-cols-2 mt-2 gap-2">
-                <a href="/member/modify" class="btn btn-primary btn-outline">프로필 수정</a>
-                <a href="/member/modifyPassword" class="btn btn-secondary btn-outline">비밀번호 변경</a>
-            </div>
+            <th:block th:if="${member.nickname} == ''">
+                <div class="grid grid-cols-2 mt-2 gap-2">
+                    <a href="/member/beAuthor" class="btn btn-primary btn-outline">필명 작성</a>
+                    <a href="/member/modifyPassword" class="btn btn-secondary btn-outline">비밀번호 변경</a>
+                </div>
+            </th:block>
+            <th:block th:unless="${member.nickname} == ''">
+                <div class="grid mt-2 gap-2">
+                    <a href="/member/modifyPassword" class="btn btn-secondary btn-outline">비밀번호 변경</a>
+                </div>
+            </th:block>
         </div>
 
     </section>

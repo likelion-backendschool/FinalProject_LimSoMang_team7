@@ -8,9 +8,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,16 +38,29 @@ public class Member extends BaseEntity {
 
     private int authLevel;
 
+    public String getName() {
+        if (nickname != null) {
+            return username;
+        }
+        return nickname;
+    }
+
     public Member(long id) {
         super(id);
     }
 
-    public Member toEntity() {
-        return Member.builder()
-                .id(super.getId())
-                .username(username)
-                .email(email)
-                .nickname(nickname)
-                .build();
+    public List<GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("MEMBER"));
+
+        if (StringUtils.hasText(nickname)) {
+            authorities.add(new SimpleGrantedAuthority("AUTHOR"));
+        }
+
+        if (authLevel == 7) {
+            authorities.add(new SimpleGrantedAuthority("ADMIN"));
+        }
+
+        return authorities;
     }
 }

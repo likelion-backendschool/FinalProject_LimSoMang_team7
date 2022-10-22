@@ -4,6 +4,7 @@ import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
 import com.ll.exam.ebooks.app.security.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,28 +18,15 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Member> _member = memberRepository.findByUsername(username);
+        Member member = memberRepository.findByUsername(username).get();
 
-        if (_member.isEmpty()) {
-            throw new UsernameNotFoundException("사용자가 존재하지 않습니다.");
-        }
-
-        Member member = _member.get();
-
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        if (member.getAuthLevel() > 6) {
-            authorities.add(new SimpleGrantedAuthority("ADMIN"));
-        }
-
-        authorities.add(new SimpleGrantedAuthority("MEMBER"));
-
-        return new MemberContext(member, authorities);
+        return new MemberContext(member, member.getAuthorities());
     }
 }

@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.member.dto;
+package com.ll.exam.ebooks.app.member.form;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

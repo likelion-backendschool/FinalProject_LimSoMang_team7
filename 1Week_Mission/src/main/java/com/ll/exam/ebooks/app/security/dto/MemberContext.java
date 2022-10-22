@@ -46,4 +46,9 @@ public class MemberContext extends User {
     public String getName() {
         return getUsername();
     }
+
+    public boolean hasAuthority(String authorityName) {
+        return getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(authorityName));
+    }
 }

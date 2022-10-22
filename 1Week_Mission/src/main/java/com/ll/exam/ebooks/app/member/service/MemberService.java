@@ -1,11 +1,16 @@
 package com.ll.exam.ebooks.app.member.service;
 
+import com.ll.exam.ebooks.app.member.form.JoinForm;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.mail.service.MailService;
+import com.ll.exam.ebooks.app.member.exception.AlreadyJoinException;
 import com.ll.exam.ebooks.app.member.exception.MemberNotFoundException;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
+import com.ll.exam.ebooks.app.security.dto.MemberContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
@@ -23,14 +28,40 @@ public class MemberService {
 
 
     @Transactional
-    public Member join(String username, String password, String email, String nickname) {
+    public Member join(JoinForm joinForm) {
+        if (memberRepository.findByUsername(joinForm.getUsername()).isPresent()) {
+            throw new AlreadyJoinException();
+        }
+
         Member member = Member
                 .builder()
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .email(email)
-                .nickname(nickname)
+                .username(joinForm.getUsername())
+                .password(passwordEncoder.encode(joinForm.getPassword()))
+                .email(joinForm.getEmail())
+                .nickname(joinForm.getNickname())
                 .authLevel(3)
+                .build();
+
+        memberRepository.save(member);
+
+        mailService.joinMailSend(member);
+
+        return member;
+    }
+
+    @Transactional
+    public Member adminJoin(JoinForm joinForm) {
+        if (memberRepository.findByUsername(joinForm.getUsername()).isPresent()) {
+            throw new AlreadyJoinException();
+        }
+
+        Member member = Member
+                .builder()
+                .username(joinForm.getUsername())
+                .password(passwordEncoder.encode(joinForm.getPassword()))
+                .email(joinForm.getEmail())
+                .nickname(joinForm.getNickname())
+                .authLevel(7)
                 .build();
 
         memberRepository.save(member);
@@ -42,20 +73,17 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberNotFoundException("정보에 맞는 회원이 존재하지 않습니다."));
+        return memberRepository.findByEmail(email).orElse(null);
     }
 
     @Transactional(readOnly = true)
     public Member findByUsernameAndEmail(String username, String email) {
-        return memberRepository.findByUsernameAndEmail(username, email)
-                .orElseThrow(() -> new MemberNotFoundException("정보에 맞는 회원이 존재하지 않습니다."));
+        return memberRepository.findByUsernameAndEmail(username, email).orElse(null);
     }
 
     @Transactional(readOnly = true)
     public Member findByUsername(String username) {
-        return memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("회원이 존재하지 않습니다."));
+        return memberRepository.findByUsername(username).orElse(null);
     }
 
     @Transactional
@@ -80,12 +108,47 @@ public class MemberService {
     }
 
     @Transactional
-    public void modifyPassword(String username, String password) {
-        Member member = memberRepository.findByUsername(username).orElse(null);
+    public boolean modifyPassword(Member member, String oldPassword, String password) {
+        Optional<Member> opMember = memberRepository.findByUsername(member.getUsername());
 
-        if (member != null) {
-            member.setPassword(passwordEncoder.encode(password));
-            memberRepository.save(member);
+        if (passwordEncoder.matches(oldPassword, opMember.get().getPassword()) == false) {
+            return false;
         }
+
+        opMember.get().setPassword(passwordEncoder.encode(password));
+
+        return true;
     }
+
+    @Transactional
+    public boolean beAuthor(Member member, String nickname) {
+        Optional<Member> opMember = memberRepository.findByNickname(nickname);
+
+        if (opMember.isPresent()) {
+            return false;
+        }
+
+        opMember = memberRepository.findById(member.getId());
+
+        opMember.get().setNickname(nickname);
+        forceAuthentication(opMember.get());
+
+        return true;
+    }
+
+    private void forceAuthentication(Member member) {
+        MemberContext memberContext = new MemberContext(member, member.getAuthorities());
+
+        UsernamePasswordAuthenticationToken authentication =
+                UsernamePasswordAuthenticationToken.authenticated(
+                        memberContext,
+                        member.getPassword(),
+                        memberContext.getAuthorities()
+                );
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+    }
+
 }
