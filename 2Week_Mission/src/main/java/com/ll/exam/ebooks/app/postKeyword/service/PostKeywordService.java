@@ -4,11 +4,13 @@ import com.ll.exam.ebooks.app.postKeyword.entity.PostKeyword;
 import com.ll.exam.ebooks.app.postKeyword.repository.PostKeywordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PostKeywordService {
     private final PostKeywordRepository postKeywordRepository;
@@ -39,5 +41,9 @@ public class PostKeywordService {
 
     public List<PostKeyword> findByMemberId(Long authorId) {
         return postKeywordRepository.getQslAllByAuthorId(authorId);
+    }
+
+    public Optional<PostKeyword> findById(long id) {
+        return postKeywordRepository.findById(id);
     }
 }

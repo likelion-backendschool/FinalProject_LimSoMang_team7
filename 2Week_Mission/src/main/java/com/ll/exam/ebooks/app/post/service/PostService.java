@@ -54,12 +54,15 @@ public class PostService {
         postRepository.save(post);
 
         // hashTag 적용
-        String keywords = postForm.getHashTags();
-        if (keywords != null) {
-            postHashTagService.apply(post, keywords);
-        }
+        applyPostHashTags(post, postForm.getPostHashTags());
 
         return post;
+    }
+
+    // postHashTag 저장
+    @Transactional
+    public void applyPostHashTags(Post post, String postHashTags) {
+        postHashTagService.apply(post, postHashTags);
     }
 
     @Transactional
@@ -69,7 +72,7 @@ public class PostService {
         post.setContentHtml(postForm.getContentHtml());
 
         // 해시태그 적용
-        String keywords = postForm.getHashTags();
+        String keywords = postForm.getPostHashTags();
         if (keywords != null) {
             postHashTagService.apply(post, keywords);
         }

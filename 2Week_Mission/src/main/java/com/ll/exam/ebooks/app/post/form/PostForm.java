@@ -18,5 +18,5 @@ public class PostForm {
     private String contentHtml;
 
     @NotEmpty
-    private String hashTags;
+    private String postHashTags;
 }

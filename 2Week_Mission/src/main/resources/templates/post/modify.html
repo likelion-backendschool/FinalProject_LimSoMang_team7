@@ -43,11 +43,11 @@
                         return;
                     }
 
-                    form.keywords.value = form.keywords.value.trim();
+                    form.postHashTags.value = form.postHashTags.value.trim();
 
-                    if (form.keywords.value.length == 0) {
+                    if (form.postHashTags.value.length == 0) {
                         warningModal("최소 1개의 해시태그를 입력해주세요.");
-                        form.keywords.focus();
+                        form.postHashTags.focus();
 
                         return;
                     }
@@ -81,7 +81,7 @@
                     <label class="label">
                         <span class="label-text">해시태그</span>
                     </label>
-                    <input type="text" name="hashTags" placeholder="#태그입력" class="input input-bordered"
+                    <input type="text" name="postHashTags" placeholder="#태그입력" class="input input-bordered"
                            th:value="${post.hashTagString}">
                 </div>
 

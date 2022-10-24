@@ -7,6 +7,7 @@ import com.ll.exam.ebooks.app.postHashTag.repository.PostHashTagRepository;
 import com.ll.exam.ebooks.app.postKeyword.service.PostKeywordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,11 +15,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PostHashTagService {
     private final PostHashTagRepository postHashTagRepository;
     private final PostKeywordService postKeywordService;
 
+    @Transactional
     public void apply(Post post, String keywords) {
         // 1. 기존 해시태그 가져오기
         List<PostHashTag> oldHashTags = findByPostId(post.getId());
@@ -55,7 +58,7 @@ public class PostHashTagService {
     }
 
     // 해시태그 저장
-    public PostHashTag save(Post post, String keywordContent) {
+    private PostHashTag save(Post post, String keywordContent) {
         // 1. keyword 저장 및 가져오기
         PostKeyword keyword = postKeywordService.save(keywordContent);
 
@@ -84,6 +87,7 @@ public class PostHashTagService {
         return postHashTagRepository.findAllByPostId(postId);
     }
 
+    @Transactional
     public void delete(Post post) {
         List<PostHashTag> postHashTags = postHashTagRepository.findAllByPostId(post.getId());
 
