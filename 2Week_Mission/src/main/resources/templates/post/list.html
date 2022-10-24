@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>LIST</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-3xl w-full px-2 pt-4">
+            <h1 class="font-bold text-2xl text-center mb-4">L I S T</h1>
+            <div class="text-right mb-3">
+                <a href="/post/list" class="btn btn-outline btn-sm">all</a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="table w-full">
+                    <!-- head -->
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>해시태그</th>
+                        <th>작성날짜</th>
+                        <th>수정날짜</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="post : ${posts}">
+                        <tr class="hover">
+                            <th th:text="${post.id}"></th>
+                            <td>
+                                <a th:href="|/post/${post.id}|" th:text="${post.subject}"></a>
+                            </td>
+                            <td th:text="${post.author.nickname}"></td>
+                            <td>
+                                <th:block th:each="tag : ${post.hashTags}">
+                                    <a class="btn btn-xs btn-outline btn-primary"
+                                       th:href="${tag.getSearchUrl}"
+                                       th:text="|#${tag.postKeyword.content}|"/>
+                                </th:block>
+                            </td>
+                            <td th:text="${#temporals.format(post.createDate, 'yy.MM.dd HH:mm')}"></td>
+                            <td th:text="${#temporals.format(post.modifyDate, 'yy.MM.dd HH:mm')}"></td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+</main>
+</body>
+</html>
