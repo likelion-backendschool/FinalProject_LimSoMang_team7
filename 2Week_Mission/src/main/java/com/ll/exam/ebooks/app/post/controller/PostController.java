@@ -2,7 +2,7 @@ package com.ll.exam.ebooks.app.post.controller;
 
 import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.entity.Member;
-import com.ll.exam.ebooks.app.post.dto.PostForm;
+import com.ll.exam.ebooks.app.post.form.PostForm;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.exception.ActorCanNotModifyException;
 import com.ll.exam.ebooks.app.post.service.PostService;

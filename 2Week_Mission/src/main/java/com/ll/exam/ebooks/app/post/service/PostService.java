@@ -1,7 +1,7 @@
 package com.ll.exam.ebooks.app.post.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
-import com.ll.exam.ebooks.app.post.dto.PostForm;
+import com.ll.exam.ebooks.app.post.form.PostForm;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.exception.PostNotFoundException;
 import com.ll.exam.ebooks.app.post.repository.PostRepository;
