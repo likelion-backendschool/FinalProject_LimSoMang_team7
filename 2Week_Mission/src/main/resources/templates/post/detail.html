@@ -56,10 +56,29 @@
                      th:utext="${post.contentHtml}"></div>
             </div>
 
-            <div th:if="${post.getAuthor().username} == ${#authentication.principal.username}" class="text-right">
-                <a th:href="|/post/${post.id}/modify|" class="btn btn-outline btn-sm">수정</a>
-                <a th:onclick="return confirm('[[${post.id}]]번 글을 삭제하겠습니까?')" th:href="|/post/${post.id}/delete|" class="btn btn-outline btn-sm">삭제</a>
+            <div class="text-right">
+                <button type="button" onclick="history.back();" class="btn btn-secondary btn-sm  btn-outline">
+                    <i class="fa-solid fa-angle-left"></i>
+                    <span class="ml-1">이전</span>
+                </button>
+
+                <a th:if="${@postService.actorCanModify(@rq.member, post)}"
+                   th:href="@{|/post/${post.id}/modify|}"
+                   class="btn btn-secondary btn-sm btn-outline">
+                    <i class="fa-solid fa-eraser"></i>
+                    <span class="ml-1">수정</span>
+                </a>
+
+                <a th:if="${@postService.actorCanDelete(@rq.member, post)}" href="javascript:;"
+                   onclick="if ( confirm('정말로 삭제하시겠습니까?') ) $(this).next().submit();"
+                   class="btn btn-secondary btn-sm btn-outline">
+                    <i class="fa-solid fa-trash"></i>
+                    <span class="ml-1">삭제</span>
+                </a>
+                <form th:action="@{|/post/${post.id}/delete|}" method="POST" hidden></form>
             </div>
+
+
 
         </div>
 

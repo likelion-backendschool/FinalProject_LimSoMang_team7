@@ -25,6 +25,14 @@ public class PostService {
         });
     }
 
+    public Post findByIdAndPostHashTagFindByPostId(long id) {
+        Post post = postRepository.findById(id).orElse(null);
+
+        post.setHashTags(postHashTagService.findByPostId(id));
+
+        return post;
+    }
+
     // 전체 글 리스트 조회
     public List<Post> mainList(String kwType, String kw) {
         return postRepository.mainListSearchQsl(kwType, kw);
@@ -105,5 +113,9 @@ public class PostService {
         return actorCanModify(actor, post);
     }
 
-
+    public Post findBySubject(String subject) {
+        return postRepository.findBySubject(subject).orElseThrow(() -> {
+            throw new PostNotFoundException();
+        });
+    }
 }

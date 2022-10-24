@@ -52,6 +52,9 @@ public class PostController {
 
         Post post = postService.write(author, postForm);
 
+        System.out.println("post : " + post);
+
+
         return "redirect:/post/%d".formatted(post.getId());
     }
 
@@ -124,7 +127,7 @@ public class PostController {
 
     // 글 삭제 구현
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String delete(@PathVariable long id) {
         Member member = rq.getMember();
         Post post = postService.findById(id);
