@@ -15,6 +15,12 @@ public class ProductForm {
     @NotNull
     private int price;
 
+    @NotBlank
+    private String content;
+
+    @NotBlank
+    private String contentHtml;
+
     @NotNull
     private Long postKeywordId;
 

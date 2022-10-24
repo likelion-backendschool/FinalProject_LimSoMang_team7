@@ -31,18 +31,20 @@ public class ProductService {
     public Product create(Member author, ProductForm productForm) {
         PostKeyword postKeyword = postKeywordService.findById(productForm.getPostKeywordId()).get();
 
-        return create(author, productForm.getSubject(), productForm.getPrice(), postKeyword, productForm.getProductHashTags());
+        return create(author, productForm.getSubject(), productForm.getPrice(), productForm.getContent(), productForm.getContentHtml(), postKeyword, productForm.getProductHashTags());
     }
 
     // product 생성
     @Transactional
-    public Product create(Member author, String subject, int price, PostKeyword postKeyword, String productHashTags) {
+    public Product create(Member author, String subject, int price, String content, String contentHtml, PostKeyword postKeyword, String productHashTags) {
         Product product = Product
                 .builder()
                 .author(author)
                 .postKeyword(postKeyword)
                 .subject(subject)
                 .price(price)
+                .content(content)
+                .contentHtml(contentHtml)
                 .build();
 
         productRepository.save(product);

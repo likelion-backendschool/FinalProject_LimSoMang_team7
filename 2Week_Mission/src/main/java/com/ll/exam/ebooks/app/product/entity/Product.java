@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -33,6 +34,12 @@ public class Product extends BaseEntity {
     private String subject;
 
     private int price;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String content;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String contentHtml;
 
     public Product(long id) {
         super(id);

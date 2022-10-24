@@ -41,6 +41,16 @@
                         return;
                     }
 
+                    const editor = $(form).find(".toast-ui-editor").data("data-toast-editor");
+                    const markdown = editor.getMarkdown().trim();
+                    const html = editor.getHTML().trim();
+
+                    if (markdown.length == 0) {
+                        warningModal("내용을 입력해주세요.");
+
+                        return;
+                    }
+
                     form.productHashTags.value = form.productHashTags.value.trim();
 
                     if (form.productHashTags.value.length == 0) {
@@ -90,6 +100,14 @@
 
                 <div class="form-control">
                     <label class="label">
+                        <span class="label-text">상품 설명</span>
+                    </label>
+                    <div class="toast-ui-editor" toast-ui-editor--height="calc(100vh)"></div>
+
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
                         <span class="label-text">태그</span>
                     </label>
                     <input type="text" name="productHashTags" placeholder="#태그입력"
@@ -111,6 +129,8 @@
         </div>
 
     </section>
+
+    <th:block th:replace="fragment/toastEditor :: toastEditor"></th:block>
 
 </main>
 </body>
