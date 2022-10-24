@@ -65,7 +65,7 @@ public class MemberController {
 
         memberService.join(joinForm);
 
-        return "/member/login";
+        return "redirect:/member/login";
     }
 
     @PreAuthorize("isAnonymous()")
@@ -119,6 +119,26 @@ public class MemberController {
     }
 
     @PreAuthorize("isAuthenticated()")
+    @GetMapping("/beAuthor")
+    public String showBeAuthor() {
+        return "member/beAuthor";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/beAuthor")
+    public String beAuthor(String nickname) {
+        Member member = rq.getMember();
+
+        boolean isAuthor = memberService.beAuthor(member, nickname);
+
+        if (!isAuthor) {
+            return "redirect:/member/beAuthor?errorMsg=" + Ut.url.encode("이미 사용 중인 닉네임입니다.");
+        }
+
+        return "redirect:/member/profile";
+    }
+
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/modifyPassword")
     public String showModifyPassword(Model model) {
         Member member = rq.getMember();
@@ -136,26 +156,6 @@ public class MemberController {
 
         if (!isModify) {
             return rq.historyBack("비밀번호 변경에 실패했습니다.");
-        }
-
-        return "redirect:/member/profile";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/beAuthor")
-    public String showBeAuthor() {
-        return "member/beAuthor";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/beAuthor")
-    public String beAuthor(String nickname) {
-        Member member = rq.getMember();
-
-        boolean isAuthor = memberService.beAuthor(member, nickname);
-
-        if (!isAuthor) {
-            return "redirect:/member/beAuthor?errorMsg=" + Ut.url.encode("이미 사용 중인 닉네임입니다.");
         }
 
         return "redirect:/member/profile";
