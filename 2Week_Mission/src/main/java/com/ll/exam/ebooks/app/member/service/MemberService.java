@@ -83,6 +83,10 @@ public class MemberService {
         return memberRepository.findByUsername(username).orElse(null);
     }
 
+    public Member findByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname).orElse(null);
+    }
+
     @Transactional
     public void setTempPassword(Member member) {
         UUID uuid = UUID.randomUUID();
@@ -93,15 +97,6 @@ public class MemberService {
         memberRepository.save(member);
 
         mailService.tempPasswordMailSend(member, tempPassword);
-    }
-
-    @Transactional
-    public void modify(String username, String email, String nickname) {
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("회원이 존재하지 않습니다."));
-
-        member.setEmail(email);
-        member.setNickname(nickname);
     }
 
     @Transactional
@@ -146,9 +141,5 @@ public class MemberService {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
-    }
-
-    public Member findByNickname(String nickname) {
-        return memberRepository.findByNickname(nickname).orElse(null);
     }
 }
