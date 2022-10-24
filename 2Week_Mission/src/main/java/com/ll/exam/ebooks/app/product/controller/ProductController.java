@@ -3,6 +3,7 @@ package com.ll.exam.ebooks.app.product.controller;
 import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.post.entity.Post;
+import com.ll.exam.ebooks.app.post.exception.ActorCanNotModifyException;
 import com.ll.exam.ebooks.app.postKeyword.entity.PostKeyword;
 import com.ll.exam.ebooks.app.postKeyword.service.PostKeywordService;
 import com.ll.exam.ebooks.app.product.entity.Product;
@@ -70,5 +71,23 @@ public class ProductController {
         model.addAttribute("products", products);
 
         return "product/list";
+    }
+
+    // 상품 수정 폼
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}/modify")
+    public String showModify(@PathVariable long id, Model model) {
+        Product product = productService.findById(id);
+
+        Member actor = rq.getMember();
+
+        if (!productService.actorCanModify(actor, product)) {
+//            return "redirect:/product/%s".formatted(id);
+            throw new ActorCanNotModifyException();
+        }
+
+        model.addAttribute("product", product);
+
+        return "product/modify";
     }
 }

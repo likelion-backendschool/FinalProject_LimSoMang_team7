@@ -19,6 +19,7 @@ import javax.persistence.OneToMany;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
@@ -53,5 +54,18 @@ public class Product extends BaseEntity {
 
     public Product(long id) {
         super(id);
+    }
+
+    public String getHashTagString() {
+        if (hashTags.isEmpty()) {
+            return "";
+        }
+
+        return "#" + hashTags
+                .stream()
+                .map(hashTag -> hashTag.getProductKeyword().getContent())
+                .sorted()
+                .collect(Collectors.joining(" #"))
+                .trim();
     }
 }
