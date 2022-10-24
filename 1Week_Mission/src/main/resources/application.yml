@@ -1,0 +1,23 @@
+spring:
+  profiles:
+    active: dev
+    include:
+      - base-addi
+      - API-KEY
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+logging:
+  level:
+    root: info
+    com.ll.exam.ebooks.app: debug
+    org.hibernate.type.descriptor: trace
+custom:
+  site:
+    name: 멋북스
+    baseUrl: "https://localhost:8080"
