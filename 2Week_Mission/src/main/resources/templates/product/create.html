@@ -41,11 +41,11 @@
                         return;
                     }
 
-                    form.postHashTagContents.value = form.postHashTagContents.value.trim();
+                    form.productHashTags.value = form.productHashTags.value.trim();
 
-                    if (form.postHashTagContents.value.length == 0) {
+                    if (form.productHashTags.value.length == 0) {
                         warningModal("태그를 입력해주세요.");
-                        form.postHashTagContents.focus();
+                        form.productHashTags.focus();
 
                         return;
                     }
@@ -92,7 +92,7 @@
                     <label class="label">
                         <span class="label-text">태그</span>
                     </label>
-                    <input type="text" name="postHashTagContents" placeholder="#태그입력"
+                    <input type="text" name="productHashTags" placeholder="#태그입력"
                            class="input input-bordered"
                            maxlength="50">
                 </div>
