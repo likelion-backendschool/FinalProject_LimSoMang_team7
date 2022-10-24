@@ -61,4 +61,14 @@ public class ProductController {
 
         return "product/detail";
     }
+
+    // 리스트
+    @GetMapping("/list")
+    public String list(Model model) {
+        List<Product> products = productService.findAll();
+
+        model.addAttribute("products", products);
+
+        return "product/list";
+    }
 }

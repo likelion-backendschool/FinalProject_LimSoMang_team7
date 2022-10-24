@@ -40,4 +40,9 @@ public class ProductHashTag extends BaseEntity {
     @ManyToOne
     @ToString.Exclude
     private ProductKeyword productKeyword;
+
+    public String getSearchUrl() {
+        String url = "/product/list?kwType=hashTag&kw=%s".formatted(this.getProductKeyword().getContent());
+        return url;
+    }
 }

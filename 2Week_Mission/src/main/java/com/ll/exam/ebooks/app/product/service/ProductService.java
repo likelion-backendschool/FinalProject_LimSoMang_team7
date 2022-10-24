@@ -84,4 +84,8 @@ public class ProductService {
     public boolean actorCanDelete(Member actor, Product product) {
         return actorCanModify(actor, product);
     }
+
+    public List<Product> findAll() {
+        return productRepository.findAllByOrderByIdDesc();
+    }
 }
