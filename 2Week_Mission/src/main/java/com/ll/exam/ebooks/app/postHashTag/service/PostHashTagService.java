@@ -69,7 +69,7 @@ public class PostHashTagService {
         // 3. (postId + keywordId) 로 DB에 없으면 hashTag 저장
         hashTag = PostHashTag
                 .builder()
-                .member(post.getAuthor())
+                .author(post.getAuthor())
                 .post(post)
                 .postKeyword(keyword)
                 .build();

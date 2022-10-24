@@ -40,4 +40,8 @@ public class Rq {
         req.setAttribute("alertMsg", msg);
         return "common/js";
     }
+
+    public Long getId() {
+        return member.getId();
+    }
 }
