@@ -8,9 +8,11 @@ import com.ll.exam.ebooks.app.postKeyword.entity.PostKeyword;
 import com.ll.exam.ebooks.app.postKeyword.service.PostKeywordService;
 import com.ll.exam.ebooks.app.product.entity.Product;
 import com.ll.exam.ebooks.app.product.form.ProductForm;
+import com.ll.exam.ebooks.app.product.form.ProductModifyForm;
 import com.ll.exam.ebooks.app.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,7 +68,7 @@ public class ProductController {
     // 리스트
     @GetMapping("/list")
     public String list(Model model) {
-        List<Product> products = productService.findAll();
+        List<Product> products = productService.findAllByOrderByIdDesc();
 
         model.addAttribute("products", products);
 
@@ -89,5 +91,22 @@ public class ProductController {
         model.addAttribute("product", product);
 
         return "product/modify";
+    }
+
+    // 상품 수정 로직 구현
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/modify")
+    public String modify(@PathVariable long id, @Valid ProductModifyForm productModifyForm) {
+        Product product = productService.findById(id);
+
+        Member actor = rq.getMember();
+
+        if (!productService.actorCanModify(actor, product)) {
+            throw new ActorCanNotModifyException();
+        }
+
+        productService.modify(product, productModifyForm);
+
+        return "redirect:/product/" + product.getId();
     }
 }

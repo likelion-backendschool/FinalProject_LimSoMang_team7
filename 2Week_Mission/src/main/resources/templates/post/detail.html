@@ -45,6 +45,7 @@
                 <label class="label">
                     <span class="label-text">해시태그</span>
                 </label>
+
                 <span th:each="tag : ${post.hashTags}" class="mr-2">
                     <button class="postTag btn btn-xs btn-secondary" th:text="|#${tag.postKeyword.content}|"/>
                 </span>

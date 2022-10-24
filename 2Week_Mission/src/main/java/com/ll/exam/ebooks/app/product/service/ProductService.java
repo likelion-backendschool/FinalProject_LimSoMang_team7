@@ -8,6 +8,7 @@ import com.ll.exam.ebooks.app.postKeyword.entity.PostKeyword;
 import com.ll.exam.ebooks.app.postKeyword.service.PostKeywordService;
 import com.ll.exam.ebooks.app.product.entity.Product;
 import com.ll.exam.ebooks.app.product.form.ProductForm;
+import com.ll.exam.ebooks.app.product.form.ProductModifyForm;
 import com.ll.exam.ebooks.app.product.repository.ProductRepository;
 import com.ll.exam.ebooks.app.productHashTag.service.ProductHashTagService;
 import lombok.RequiredArgsConstructor;
@@ -60,10 +61,21 @@ public class ProductService {
         productHashTagService.apply(product, productHashTags);
     }
 
+    // 상품 수정
+    @Transactional
+    public void modify(Product product, ProductModifyForm productModifyForm) {
+        product.setSubject(productModifyForm.getSubject());
+        product.setContent(productModifyForm.getContent());
+        product.setContentHtml(productModifyForm.getContentHtml());
+
+        applyProductHashTags(product, productModifyForm.getProductHashTags());
+    }
+
     public Product findById(Long id) {
         return productRepository.findById(id).orElse(null);
     }
 
+    // 상품에 포함된 글 리스트 조회
     public List<Post> findPostsByProduct(Product product) {
         Member author = product.getAuthor();
         PostKeyword postKeyword = product.getPostKeyword();
@@ -75,17 +87,20 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    // 전체 상품 리스트 조회
+    public List<Product> findAllByOrderByIdDesc() {
+        return productRepository.findAllByOrderByIdDesc();
+    }
+
+    // 상품 수정 권한 여부 체크(권한: 작가 본인)
     public boolean actorCanModify(Member actor, Product product) {
         if (actor == null) return false;
 
         return actor.getId().equals(product.getAuthor().getId());
     }
 
+    // 상품 삭제 권한 여부 체크(권한: 작가 본인)
     public boolean actorCanDelete(Member actor, Product product) {
         return actorCanModify(actor, product);
-    }
-
-    public List<Product> findAll() {
-        return productRepository.findAllByOrderByIdDesc();
     }
 }

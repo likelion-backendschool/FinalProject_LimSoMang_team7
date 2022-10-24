@@ -10,9 +10,11 @@
     <section class="section flex-grow flex flex-col items-center justify-center">
 
         <div class="max-w-2xl w-full px-2 pt-4">
-            <h1 class="font-bold text-lg">
-                <i class="fa-solid fa-eraser"></i> 도서 수정
-            </h1>
+            <div class="text-center">
+                <h1 class="font-bold text-2xl">
+                    <i class="fa-solid fa-eraser"></i> 도서 수정
+                </h1>
+            </div>
 
             <script>
                 let ProductModify__submitDone = false;
@@ -31,11 +33,11 @@
                         return;
                     }
 
-                    form.postTagContents.value = form.postTagContents.value.trim();
+                    form.productHashTags.value = form.productHashTags.value.trim();
 
-                    if (form.postTagContents.value.length == 0) {
+                    if (form.productHashTags.value.length == 0) {
                         warningModal("태그를 입력해주세요.");
-                        form.postTagContents.focus();
+                        form.productHashTags.focus();
 
                         return;
                     }
@@ -65,72 +67,60 @@
                 <input type="hidden" name="content">
                 <input type="hidden" name="contentHtml">
 
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">번호</span>
-                    </label>
-
+                <div class="my-3 inline">
+                    <h2 class="font-bold mb-1"><i class="fa-solid fa-arrow-down-9-1"></i> 번호</h2>
                     <div class="badge badge-outline" th:text="${product.id}"></div>
                 </div>
 
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">날짜</span>
-                    </label>
-                    <div class="flex flex-wrap gap-2">
-
-                        <div class="badge badge-outline">
-                            <i class="fa-solid fa-pen"></i>
-                            <span class="ml-1">작성</span>
-                            <span class="ml-1"
-                                  th:text="${#temporals.format(product.createDate, 'yy-MM-dd HH:mm')}"></span>
+                <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-wrap gap-3">
+                        <div>
+                            <div class="badge badge-outline">
+                                <i class="fa-solid fa-pen"></i>
+                                <span class="ml-1">작성날짜</span>
+                                <span class="ml-1"
+                                      th:text="${#temporals.format(product.createDate, 'yy-MM-dd HH:mm')}"></span>
+                            </div>
                         </div>
-                        <div class="badge badge-outline">
-                            <i class="fa-solid fa-eraser"></i>
-                            <span class="ml-1">수정</span>
-                            <span class="ml-1"
-                                  th:text="${#temporals.format(product.modifyDate, 'yy-MM-dd HH:mm')}"></span>
+
+                        <div>
+                            <div class="badge badge-outline">
+                                <i class="fa-solid fa-eraser"></i>
+                                <span class="ml-1">수정날짜</span>
+                                <span class="ml-1"
+                                      th:text="${#temporals.format(product.modifyDate, 'yy-MM-dd HH:mm')}"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">글 태그</span>
-                    </label>
+                <div class="my-3 inline">
+                    <h2 class="font-bold mb-1"><i class="fa-solid fa-hashtag"></i> 글 태그</h2>
                     <div class="badge badge-secondary" th:text="${product.postKeyword.content}"></div>
                 </div>
 
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">제목</span>
-                    </label>
+                <div class="form-control my-3">
+                    <h2 class="font-bold mb-1"><i class="fa-solid fa-check"></i> 제목</h2>
                     <input autofocus type="text" name="subject" placeholder="제목" class="input input-bordered"
                            maxlength="50" th:value="${product.subject}">
                 </div>
 
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">가격</span>
-                    </label>
+                <div class="form-control my-3">
+                    <h2 class="font-bold mb-1"><i class="fa-solid fa-barcode"></i> 가격</h2>
                     <input autofocus type="text" name="price" placeholder="가격" class="input input-bordered"
                            maxlength="50" th:value="${product.price}">
                 </div>
 
                 <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">내용</span>
-                    </label>
+                    <h2 class="font-bold mb-1"><i class="fa-solid fa-check"></i> 내용</h2>
                     <div class="toast-ui-editor" toast-ui-editor--height="calc(100vh)">
                         <script type="text/x-template" th:utext="${product.content}"></script>
                     </div>
                 </div>
 
                 <div class="form-control mt-3">
-                    <label class="label">
-                        <span class="label-text">해시태그</span>
-                    </label>
-                    <input type="text" name="postHashTags" placeholder="#태그입력" class="input input-bordered"
+                    <h2 class="font-bold mb-1"><i class="fa-solid fa-hashtag"></i> 도서 해시태그</h2>
+                    <input type="text" name="productHashTags" placeholder="#태그입력" class="input input-bordered"
                            th:value="${product.hashTagString}">
                 </div>
 
