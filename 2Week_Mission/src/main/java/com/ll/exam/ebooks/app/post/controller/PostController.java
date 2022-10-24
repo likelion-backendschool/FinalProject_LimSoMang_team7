@@ -41,7 +41,7 @@ public class PostController {
             return "redirect:/member/beAuthor";
         }
 
-        return "/post/write";
+        return "post/write";
     }
 
     // 글 작성
@@ -64,9 +64,8 @@ public class PostController {
 
         post.setHashTags(postHashTagService.findByPostId(id));
 
-        log.debug("post : " + post);
         // 조회 권한 검사
-        if (postService.canSelect(member, post) == false) {
+        if (postService.actorCanSee(member, post) == false) {
             throw new ActorCanNotModifyException();
         }
 
@@ -98,7 +97,7 @@ public class PostController {
         Post post = postService.findById(id);
 
         // 수정 권한 검사
-        if (!postService.canModify(member, post)) {
+        if (!postService.actorCanModify(member, post)) {
             throw new ActorCanNotModifyException();
         }
         model.addAttribute("post", post);
@@ -115,7 +114,7 @@ public class PostController {
         Post post = postService.findById(id);
 
         // 수정 권한 검사
-        if (!postService.canModify(member, post)) {
+        if (!postService.actorCanModify(member, post)) {
             throw new ActorCanNotModifyException();
         }
         postService.modify(post, postForm);
@@ -130,7 +129,7 @@ public class PostController {
         Member member = rq.getMember();
         Post post = postService.findById(id);
 
-        if (!postService.canDelete(member, post)) {
+        if (!postService.actorCanDelete(member, post)) {
             throw new ActorCanNotModifyException();
         }
         postService.delete(post);

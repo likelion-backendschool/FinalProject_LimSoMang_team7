@@ -90,18 +90,18 @@ public class PostService {
     }
 
     // 글 수정 권한 여부 체크(권한: 글쓴이 본인)
-    public boolean canModify(Member member, Post post) {
-        return member.getId().equals(post.getAuthor().getId());
+    public boolean actorCanModify(Member actor, Post post) {
+        return actor.getId().equals(post.getAuthor().getId());
     }
 
     // 글 삭제 권한 여부 체크(권한: 글쓴이 본인)
-    public boolean canDelete(Member member, Post post) {
-        return canModify(member, post);
+    public boolean actorCanDelete(Member actor, Post post) {
+        return actorCanModify(actor, post);
     }
 
     // 글 조회 권한 여부 체크(권한: 글쓴이 본인)
-    public boolean canSelect(Member member, Post post) {
-        return canModify(member, post);
+    public boolean actorCanSee(Member actor, Post post) {
+        return actorCanModify(actor, post);
     }
 
 
