@@ -1,6 +1,9 @@
 package com.ll.exam.ebooks.app.product.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
+import com.ll.exam.ebooks.app.post.entity.Post;
+import com.ll.exam.ebooks.app.postHashTag.entity.PostHashTag;
+import com.ll.exam.ebooks.app.postHashTag.service.PostHashTagService;
 import com.ll.exam.ebooks.app.postKeyword.entity.PostKeyword;
 import com.ll.exam.ebooks.app.postKeyword.service.PostKeywordService;
 import com.ll.exam.ebooks.app.product.entity.Product;
@@ -11,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -18,6 +24,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final PostKeywordService postKeywordService;
     private final ProductHashTagService productHashTagService;
+    private final PostHashTagService postHashTagService;
 
     // postKeywordId로 postKeyword 찾기
     @Transactional
@@ -49,5 +56,30 @@ public class ProductService {
     @Transactional
     public void applyProductHashTags(Product product, String productHashTags) {
         productHashTagService.apply(product, productHashTags);
+    }
+
+    public Product findById(Long id) {
+        return productRepository.findById(id).orElse(null);
+    }
+
+    public List<Post> findPostsByProduct(Product product) {
+        Member author = product.getAuthor();
+        PostKeyword postKeyword = product.getPostKeyword();
+        List<PostHashTag> postHashTags = postHashTagService.getPostTags(author.getId(), postKeyword.getId());
+
+        return postHashTags
+                .stream()
+                .map(PostHashTag::getPost)
+                .collect(Collectors.toList());
+    }
+
+    public boolean actorCanModify(Member actor, Product product) {
+        if (actor == null) return false;
+
+        return actor.getId().equals(product.getAuthor().getId());
+    }
+
+    public boolean actorCanDelete(Member actor, Product product) {
+        return actorCanModify(actor, product);
     }
 }

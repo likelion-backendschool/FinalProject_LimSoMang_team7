@@ -94,4 +94,8 @@ public class PostHashTagService {
         postHashTags.stream()
                 .forEach(p -> postHashTagRepository.delete(p));
     }
+
+    public List<PostHashTag> getPostTags(Long authorId, Long postKeywordId) {
+        return postHashTagRepository.findAllByAuthorIdAndPostKeywordIdOrderByPost_idDesc(authorId, postKeywordId);
+    }
 }
