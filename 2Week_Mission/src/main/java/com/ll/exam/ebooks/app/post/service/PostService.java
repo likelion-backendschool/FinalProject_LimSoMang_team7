@@ -80,6 +80,7 @@ public class PostService {
         postRepository.save(post);
     }
 
+    // post가 삭제되면, post + postKeyword 연결 끊기
     @Transactional
     public void delete(Post post) {
         postRepository.delete(post);

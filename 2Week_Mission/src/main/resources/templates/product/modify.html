@@ -49,9 +49,10 @@
                     form.content.value = markdown;
                     form.contentHtml.value = html;
 
-                    if (form.content.value.length == 0 || form.contentHtml.value.length == 0) {
-                        warningModal("내용을 입력해주세요");
+                    if (markdown.length == 0) {
+                        warningModal("내용을 입력해주세요.");
                         editor.focus();
+
                         return;
                     }
 

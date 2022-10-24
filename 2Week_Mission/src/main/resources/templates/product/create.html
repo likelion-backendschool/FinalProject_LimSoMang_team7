@@ -45,8 +45,12 @@
                     const markdown = editor.getMarkdown().trim();
                     const html = editor.getHTML().trim();
 
+                    form.content.value = markdown;
+                    form.contentHtml.value = html;
+
                     if (markdown.length == 0) {
                         warningModal("내용을 입력해주세요.");
+                        editor.focus();
 
                         return;
                     }
@@ -69,6 +73,9 @@
 
             <form th:action method="POST" class="flex flex-col gap-3"
                   onsubmit="ProductCreate__submit(this); return false;">
+
+                <input type="hidden" name="content">
+                <input type="hidden" name="contentHtml">
 
                 <div class="form-control">
                     <label class="label">

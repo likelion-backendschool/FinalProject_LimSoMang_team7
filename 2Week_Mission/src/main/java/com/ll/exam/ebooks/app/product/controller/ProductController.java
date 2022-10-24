@@ -1,9 +1,10 @@
 package com.ll.exam.ebooks.app.product.controller;
 
+import com.ll.exam.ebooks.app.base.exception.ActorCanNotDeleteException;
 import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.post.entity.Post;
-import com.ll.exam.ebooks.app.post.exception.ActorCanNotModifyException;
+import com.ll.exam.ebooks.app.base.exception.ActorCanNotModifyException;
 import com.ll.exam.ebooks.app.postKeyword.entity.PostKeyword;
 import com.ll.exam.ebooks.app.postKeyword.service.PostKeywordService;
 import com.ll.exam.ebooks.app.product.entity.Product;
@@ -12,7 +13,6 @@ import com.ll.exam.ebooks.app.product.form.ProductModifyForm;
 import com.ll.exam.ebooks.app.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -108,5 +108,21 @@ public class ProductController {
         productService.modify(product, productModifyForm);
 
         return "redirect:/product/" + product.getId();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable long id) {
+        Product product = productService.findById(id);
+
+        Member actor = rq.getMember();
+
+        if (!productService.actorCanDelete(actor, product)) {
+            throw new ActorCanNotDeleteException();
+        }
+
+        productService.delete(product);
+
+        return "redirect:/product/list";
     }
 }

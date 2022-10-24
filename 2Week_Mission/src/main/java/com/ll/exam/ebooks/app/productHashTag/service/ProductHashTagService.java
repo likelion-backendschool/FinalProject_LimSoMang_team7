@@ -87,4 +87,14 @@ public class ProductHashTagService {
     public List<ProductHashTag> findByProductId(Long productId) {
         return productHashTagRepository.findAllByProductId(productId);
     }
+
+    // product가 삭제되면, product + productKeyword 연결 끊기
+    @Transactional
+    public void delete(Product product) {
+        List<ProductHashTag> productHashTags = productHashTagRepository.findAllByProductId(product.getId());
+
+        productHashTags.stream()
+                .forEach(p -> productHashTagRepository.delete(p));
+
+    }
 }

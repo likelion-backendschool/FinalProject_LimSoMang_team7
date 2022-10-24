@@ -92,14 +92,28 @@ public class ProductService {
         return productRepository.findAllByOrderByIdDesc();
     }
 
+    @Transactional
+    public void delete(Product product) {
+        productRepository.delete(product);
+
+        if (product.getHashTags() != null) {
+            deleteProductHashTag(product);
+        }
+    }
+
+    @Transactional
+    public void deleteProductHashTag(Product product) {
+        productHashTagService.delete(product);
+    }
+
     // 상품 수정 권한 여부 체크(권한: 작가 본인)
     public boolean actorCanModify(Member actor, Product product) {
         if (actor == null) return false;
 
         return actor.getId().equals(product.getAuthor().getId());
     }
-
     // 상품 삭제 권한 여부 체크(권한: 작가 본인)
+
     public boolean actorCanDelete(Member actor, Product product) {
         return actorCanModify(actor, product);
     }
