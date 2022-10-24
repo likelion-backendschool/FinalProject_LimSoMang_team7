@@ -3,6 +3,7 @@ package com.ll.exam.ebooks.app.member.controller;
 import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.form.JoinForm;
 import com.ll.exam.ebooks.app.member.entity.Member;
+import com.ll.exam.ebooks.app.member.form.ModifyPasswordForm;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.util.Ut;
 import lombok.RequiredArgsConstructor;
@@ -132,7 +133,7 @@ public class MemberController {
         boolean isAuthor = memberService.beAuthor(member, nickname);
 
         if (!isAuthor) {
-            return "redirect:/member/beAuthor?errorMsg=" + Ut.url.encode("이미 사용 중인 닉네임입니다.");
+            return "redirect:/member/beAuthor?msg=" + Ut.url.encode("이미 사용 중인 닉네임입니다.");
         }
 
         return "redirect:/member/profile";
@@ -140,7 +141,7 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modifyPassword")
-    public String showModifyPassword(Model model) {
+    public String showModifyPassword(ModifyPasswordForm modifyPasswordForm, Model model) {
         Member member = rq.getMember();
 
         model.addAttribute("member", member);
@@ -150,12 +151,15 @@ public class MemberController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modifyPassword")
-    public String modifyPassword(String oldPassword, String password) {
+    public String modifyPassword(@Valid ModifyPasswordForm modifyPasswordForm, BindingResult bindingResult, Model model) {
         Member member = rq.getMember();
-        boolean isModify = memberService.modifyPassword(member, oldPassword, password);
+
+        boolean isModify = memberService.modifyPassword(member, modifyPasswordForm.getOldPassword(), modifyPasswordForm.getPassword());
 
         if (!isModify) {
-            return rq.historyBack("비밀번호 변경에 실패했습니다.");
+            bindingResult.rejectValue("oldPassword", "not match oldPassword", "현재 비밀번호를 잘못 입력했습니다.");
+            model.addAttribute("member", member);
+            return "/member/modifyPassword";
         }
 
         return "redirect:/member/profile";

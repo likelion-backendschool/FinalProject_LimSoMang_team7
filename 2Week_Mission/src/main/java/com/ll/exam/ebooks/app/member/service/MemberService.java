@@ -71,17 +71,14 @@ public class MemberService {
         return member;
     }
 
-    @Transactional(readOnly = true)
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElse(null);
     }
 
-    @Transactional(readOnly = true)
     public Member findByUsernameAndEmail(String username, String email) {
         return memberRepository.findByUsernameAndEmail(username, email).orElse(null);
     }
 
-    @Transactional(readOnly = true)
     public Member findByUsername(String username) {
         return memberRepository.findByUsername(username).orElse(null);
     }
@@ -151,4 +148,7 @@ public class MemberService {
         SecurityContextHolder.setContext(context);
     }
 
+    public Member findByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname).orElse(null);
+    }
 }
