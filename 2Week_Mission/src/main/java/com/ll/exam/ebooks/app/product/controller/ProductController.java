@@ -55,7 +55,7 @@ public class ProductController {
 
     // 상품 상세조회
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable long id, Model model) {
         Product product = productService.findById(id);
         List<Post> posts = productService.findPostsByProduct(product);
 

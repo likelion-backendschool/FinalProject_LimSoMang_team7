@@ -32,7 +32,7 @@ public class CartController {
     public String showList(Model model) {
         Member buyer = rq.getMember();
 
-        List<CartItem> cartItems = cartService.findByBuyerId(buyer.getId());
+        List<CartItem> cartItems = cartService.getItemsByBuyer(buyer.getId());
 
         model.addAttribute("cartItems", cartItems);
 

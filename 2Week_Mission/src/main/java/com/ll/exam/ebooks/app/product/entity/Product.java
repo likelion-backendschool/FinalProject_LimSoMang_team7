@@ -68,4 +68,19 @@ public class Product extends BaseEntity {
                 .collect(Collectors.joining(" #"))
                 .trim();
     }
+
+    // 실제 판매가
+    public int getSalePrice() {
+        return getPrice();
+    }
+
+    // 도매가(대행사가 가져가는 금액)
+    public int getWholesalePrice() {
+        return (int) Math.ceil(getPrice() * 0.7);
+    }
+
+    // 주문 가능 여부
+    public boolean isOrderable() {
+        return true;
+    }
 }

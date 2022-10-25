@@ -51,5 +51,12 @@ public class OrderItem extends BaseEntity {
         super(id);
     }
 
+    public OrderItem(Product product) {
+        this.product = product;
+        this.price = product.getPrice();
+        this.salePrice = product.getSalePrice();
+        this.wholesalePrice = product.getWholesalePrice();
+    }
+
 
 }

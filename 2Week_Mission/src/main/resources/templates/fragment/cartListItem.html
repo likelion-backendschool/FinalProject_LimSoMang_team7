@@ -5,21 +5,32 @@
 <th:block th:fragment="cartListItem">
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
+            <div class="form-control">
+                <input onchange="CartItemCheckbox__changed();" type="checkbox" class="cartItemCheckbox checkbox" th:value="${item.product.id}">
+            </div>
             <h2 class="card-title flex flex-wrap">
-                <a th:href="@{|/cart/${cart.id}|}" class="mr-auto">
+                <a th:href="@{|/cart/${item.id}|}" class="mr-auto">
                     <i class="fa-solid fa-newspaper"></i>
-                    <span th:text="${cart.product.subject}"></span>
+                    <span th:text="${item.product.subject}"></span>
+                </a>
+
+                <a th:href="@{|/product/${item.product.id}|}" class="btn btn-xs btn-accent">
+                    <i class="fa-solid fa-eye"></i>
+                    <span class="ml-2">보기</span>
                 </a>
             </h2>
+
             <div>
                 <i class="fa-solid fa-pen-nib"></i>
-                <span th:text="${cart.product.author.name}"></span>
+                <span th:text="${item.product.author.name}"></span>
             </div>
+
             <div class="flex">
-                <span th:text="|₩ ${cart.product.price}|"></span>
+                <span th:text="|₩ ${item.product.price}|"></span>
             </div>
+
             <div class="flex">
-                <th:block th:each="tag : ${cart.product.hashTags}">
+                <th:block th:each="tag : ${item.product.hashTags}">
                     <a class="btn btn-xs btn-outline btn-primary"
                        th:href="${tag.getSearchUrl}"
                        th:text="|#${tag.productKeyword.content}|"></a>
@@ -29,28 +40,33 @@
                 <div class="badge badge-outline">
                     <i class="fa-solid fa-pen"></i>
                     <span class="ml-2"
-                          th:text="${#temporals.format(cart.createDate, 'yy-MM-dd HH:mm')}"></span>
+                     th:text="${#temporals.format(item.createDate, 'yy-MM-dd HH:mm')}"></span>
                 </div>
             </div>
-            <div th:if="${cart.createDate != cart.modifyDate}" class="flex justify-end">
+            <div th:if="${item.createDate != item.modifyDate}" class="flex justify-end">
                 <div class="badge">
                     <i class="fa-solid fa-eraser"></i>
                     <span class="ml-2"
-                          th:text="${#temporals.format(cart.modifyDate, 'yy-MM-dd HH:mm')}"></span>
+                          th:text="${#temporals.format(item.modifyDate, 'yy-MM-dd HH:mm')}"></span>
                 </div>
             </div>
-            <div class="card-actions justify-end">
-                <a th:href="@{|/product/${cart.product.id}|}" class="btn btn-sm">
-                    <i class="fa-solid fa-eye"></i>
-                    <span class="ml-2">보기</span>
-                </a>
 
-                <a href="javascript:;" onclick="if ( confirm('정말로 삭제하시겠습니까?') ) $(this).next().submit();"
+            <div class="card-actions justify-end">
+                <a href="javascript:;" onclick="if (confirm('주문하시겠습니까?')) $(this).next().submit();"
+                   class="btn btn-sm">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <span class="ml-1">주문</span>
+                </a>
+                <form th:action="@{/order/create}" method="POST" hidden>
+                    <input type="hidden" name="productId" th:value="${item.product.id}">
+                </form>
+
+                <a href="javascript:;" onclick="if (confirm('정말로 삭제하시겠습니까?')) $(this).next().submit();"
                    class="btn btn-sm">
                     <i class="fa-solid fa-trash"></i>
                     <span class="ml-1">삭제</span>
                 </a>
-                <form th:action="@{|/cart/remove/${cart.product.id}|}" method="POST" hidden></form>
+                <form th:action="@{|/cart/remove/${item.product.id}|}" method="POST" hidden></form>
             </div>
         </div>
     </div>

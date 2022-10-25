@@ -125,7 +125,7 @@ class PostControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(handler().handlerType(PostController.class))
                 .andExpect(handler().methodName("showList"))
-                .andExpect(content().string(containsString("L I S T")));
+                .andExpect(content().string(containsString("글 목록")));
 
     }
 

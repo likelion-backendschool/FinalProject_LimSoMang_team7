@@ -71,7 +71,7 @@ public class ProductService {
         applyProductHashTags(product, productModifyForm.getProductHashTags());
     }
 
-    public Product findById(Long id) {
+    public Product findById(long id) {
         return productRepository.findById(id).orElse(null);
     }
 

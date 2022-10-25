@@ -38,7 +38,7 @@ public class CartService {
         return cartItem;
     }
 
-    public List<CartItem> findByBuyerId(Long id) {
+    public List<CartItem> getItemsByBuyer(Long id) {
         return cartItemRepository.findAllByBuyerId(id);
     }
 
@@ -48,6 +48,15 @@ public class CartService {
         CartItem cartItem = cartItemRepository.findByBuyerIdAndProductId(buyer.getId(), product.getId()).orElse(null);
 
         cartItemRepository.delete(cartItem);
+    }
+
+    @Transactional
+    public void removeCartItem(CartItem cartItem) {
+        cartItemRepository.delete(cartItem);
+    }
+
+    public CartItem getItemByBuyerAndProduct(Member buyer, Product product) {
+        return cartItemRepository.findByBuyerIdAndProductId(buyer.getId(), product.getId()).orElse(null);
     }
 
 }
