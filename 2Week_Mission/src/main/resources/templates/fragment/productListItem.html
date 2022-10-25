@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html xmlns:th="http://www.w3.org/1999/html">
+<html xmlns:th="http://www.w3.org/1999/html" lang="ko">
 
 <body>
 <th:block th:fragment="productListItem">
@@ -19,7 +19,7 @@
                 <th:block th:each="tag : ${product.hashTags}">
                     <a class="btn btn-xs btn-outline btn-primary"
                        th:href="${tag.getSearchUrl}"
-                       th:text="|#${tag.productKeyword.content}|"/>
+                       th:text="|#${tag.productKeyword.content}|"></a>
                 </th:block>
             </div>
             <div class="flex justify-end">
@@ -37,10 +37,14 @@
                 </div>
             </div>
             <div class="card-actions justify-end">
-                <a th:href class="btn btn-sm">
+                <a class="btn btn-sm" href="javascript:;"
+                onclick="$(this).next().submit();">
                     <i class="fa-solid fa-cart-plus"></i>
                     <span class="ml-2">장바구니</span>
                 </a>
+                <form th:action="@{|/cart/add/${product.id}|}" method="POST" hidden>
+                    <input type="hidden" th:value="${product.author.id}">
+                </form>
 
                 <a th:href="@{|/product/${product.id}|}" class="btn btn-sm">
                     <i class="fa-solid fa-eye"></i>
