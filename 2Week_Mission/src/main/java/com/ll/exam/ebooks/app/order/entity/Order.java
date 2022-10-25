@@ -42,7 +42,7 @@ public class Order extends BaseEntity {
 
     private boolean isCanceled; // 취소 여부
 
-    private boolean isReturned; // 환불 여부
+    private boolean isRefunded; // 환불 여부
 
     private String name; // 주문명
 
@@ -78,5 +78,12 @@ public class Order extends BaseEntity {
         }
 
         return payPrice;
+    }
+
+    public boolean isPayable() {
+        if (isPaid) return false;
+        if (isRefunded) return false;
+
+        return true;
     }
 }

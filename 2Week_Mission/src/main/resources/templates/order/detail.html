@@ -7,49 +7,68 @@
 
 <body>
 <main layout:fragment="main">
-    <section class="section flex-grow flex flex-col items-center justify-center">
+    <script src="https://js.tosspayments.com/v1"></script>
+
+    <script th:inline="javascript">
+        const orderId = /*[[ ${order.id} ]]*/ null;
+        const buyerName = /*[[ ${order.buyer.name} ]]*/ null;
+        const orderName = /*[[ ${order.name} ]]*/ null;
+        const orderPayPrice = /*[[ ${order.calculatePayPrice} ]]*/ null;
+    </script>
 
 <!--        <form hidden name="payByRestCashOnlyForm" method="POST" th:action="@{|/order/${order.id}/payByRestCashOnly|}"></form>-->
 
-        <div class="max-w-2xl w-full px-2 pt-4">
+    <section class="section flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-xl w-full px-2 pt-4">
             <div class="px-2 pt-4">
-                <h1 class="font-bold text-lg">주문 상세내용</h1>
+                <h1 class="font-bold text-2xl text-center mb-5">
+                    <i class="fa-solid fa-book-open"></i>
+                    주문 상세내용
+                </h1>
 
-                <div class="flex flex-col gap-3 mt-3">
+                <div class="flex flex-col gap-3">
 
-                    <div>
+                    <div class="my-2">
+                        <i class="fa-solid fa-check"></i>
                         주문번호 : [[${order.id}]]
                     </div>
 
-                    <div>
+                    <div class="my-2">
+                        <i class="fa-solid fa-check"></i>
                         주문날짜 : [[${order.createDate}]]
                     </div>
 
-                    <div>
+                    <div class="my-2">
+                        <i class="fa-solid fa-check"></i>
                         주문자 : [[${order.buyer.name}]]
                     </div>
 
-                    <div>
+                    <div class="my-2">
+                        <i class="fa-solid fa-check"></i>
                         주문가격 : [[${order.calculatePayPrice}]]
                     </div>
 
-                    <div>
+                    <div class="my-2">
+                        <i class="fa-solid fa-check"></i>
+                        주문 내역
                         <div th:each="orderItem : ${order.orderItems}">
-                            <div>
-                                제목 : [[${orderItem.product.subject}]] /
-                                작가명 : [[${orderItem.product.author.name}]] /
+                            <div class="my-1">
+                                * 제목 : [[${orderItem.product.subject}]] |
+                                작가명 : [[${orderItem.product.author.name}]] |
                                 가격 : [[${orderItem.salePrice}]]
                             </div>
                         </div>
                     </div>
 
-                    <!--
                     <div>
-                        <div>
+                        <div class="my-2">
+                            <i class="fa-solid fa-check"></i>
                             보유 예치금 : [[${actorRestCash}]]
                         </div>
+
                         <div th:with="maxUseRestCash = ${order.calculatePayPrice > actorRestCash ? actorRestCash : order.calculatePayPrice}">
-                            <span>사용할 예치금 : </span>
+                            <span class="mr-1">사용할 예치금 : </span>
                             <input type="number" id="PaymentForm__useRestCash"
                                    th:placeholder="|0 ~ ${maxUseRestCash}|"
                                    class="input input-bordered min-w-[300px]" min="0" th:max="${maxUseRestCash}"
@@ -62,7 +81,19 @@
                                        type="checkbox" class="ml-2 checkbox">
                             </label>
                         </div>
-                        <button th:if="${order.payable}" onclick="payment();" class="btn btn-sm btn-primary">카드결제</button>
+
+                        <div class="grid grid-cols-2 my-3 gap-2">
+                            <button th:if="${order.payable}" onclick="payment();" class="btn btn-mb btn-primary">
+                                <i class="fa-regular fa-credit-card"></i>
+                                <span class="ml-1">결제하기</span>
+                            </button>
+                            <a href="javascript:;" onclick="if ( confirm('정말로 삭제하시겠습니까?') ) $(this).next().submit();"
+                               class="btn btn-secondary btn-mb btn-outline">
+                                <i class="fa-solid fa-trash"></i>
+                                <span class="ml-1">주문취소</span>
+                            </a>
+                            <form th:action="@{|/order/${order.id}/cancel|}" method="POST" hidden></form>
+                        </div>
                         <span th:if="${order.isPaid}">결제완료</span>
                     </div>
                     <div>
@@ -72,11 +103,82 @@
                             </span>
                         </div>
                     </div>
-                    -->
                 </div>
             </div>
         </div>
     </section>
+
+    <script>
+        const $PaymentForm__useRestCash = $("#PaymentForm__useRestCash");
+        const $PaymentForm__useRestCashAll = $("#PaymentForm__useRestCashAll");
+        const $PaymentForm__pgPayPriceDisplay = $("#PaymentForm__pgPayPriceDisplay");
+
+        const tossPayments = TossPayments("test_ck_OEP59LybZ8BkX4Dw5yk36GYo7pRe");
+
+        function payment() {
+            let useRestCash = parseInt($PaymentForm__useRestCash.val());
+
+            if (orderPayPrice == useRestCash) {
+                document.payByRestCashOnlyForm.submit();
+                return;
+            }
+
+            const method = "카드"; // "카드" 혹은 "가상계좌"
+
+            const paymentData = {
+                amount: orderPayPrice - useRestCash,
+                orderId: "order__" + orderId + "__" + (Math.random() + "").substring(2),
+                orderName,
+                customerName: buyerName,
+                successUrl: window.location.origin + "/order/" + orderId + "/success",
+                failUrl: window.location.origin + "/order/" + orderId + "/fail"
+            };
+
+            tossPayments.requestPayment(method, paymentData);
+        }
+    </script>
+
+    <script>
+        function PaymentForm__useRestCashFix() {
+            let useRestCash = parseInt($PaymentForm__useRestCash.val());
+
+            if (isNaN(useRestCash)) {
+                useRestCash = 0;
+            }
+
+            const maxUseRestCash = parseInt($PaymentForm__useRestCash.attr('max'));
+
+            if (useRestCash > maxUseRestCash) {
+                useRestCash = maxUseRestCash;
+                $PaymentForm__useRestCash.val(maxUseRestCash);
+            }
+
+            if ( useRestCash == maxUseRestCash ) {
+                $PaymentForm__useRestCashAll.prop('checked', true);
+            }
+            else {
+                $PaymentForm__useRestCashAll.prop('checked', false);
+            }
+
+            const pgPayPrice = orderPayPrice - useRestCash;
+
+            $PaymentForm__pgPayPriceDisplay.text(pgPayPrice);
+        }
+
+        function PaymentForm__useRestCashAllChanged() {
+            if ( $PaymentForm__useRestCashAll.prop('checked') ) {
+                const maxUseRestCash = parseInt($PaymentForm__useRestCash.attr('max'));
+                $PaymentForm__useRestCash.val(maxUseRestCash);
+            }
+            else {
+                $PaymentForm__useRestCash.val(0);
+            }
+
+            PaymentForm__useRestCashFix();
+        }
+
+        PaymentForm__useRestCashFix();
+    </script>
 
 </main>
 </body>

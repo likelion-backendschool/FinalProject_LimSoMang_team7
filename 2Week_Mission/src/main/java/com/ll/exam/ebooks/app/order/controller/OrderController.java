@@ -36,9 +36,13 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public String showDetail(@PathVariable long id, Model model) {
+        Member buyer = rq.getMember();
         Order order = orderService.findById(id);
 
+        long restCash = memberService.getRestCash(buyer);
+
         model.addAttribute("order", order);
+        model.addAttribute("actorRestCash", restCash);
 
         return "order/detail";
     }

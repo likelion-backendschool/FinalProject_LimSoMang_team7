@@ -25,7 +25,7 @@ public class CashLog extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     private Member member;
 
-    private int price; // 변동 사유
+    private long price; // 변동 사유
 
     private String eventType; // 변동 사유
 
