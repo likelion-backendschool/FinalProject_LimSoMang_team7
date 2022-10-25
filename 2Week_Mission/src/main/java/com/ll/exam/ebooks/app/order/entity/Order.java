@@ -69,4 +69,14 @@ public class Order extends BaseEntity {
 
         this.name = name;
     }
+
+    public int calculatePayPrice() {
+        int payPrice = 0;
+
+        for(OrderItem orderItem : orderItems) {
+            payPrice += orderItem.getSalePrice();
+        }
+
+        return payPrice;
+    }
 }

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -90,4 +91,7 @@ public class OrderService {
         return order;
     }
 
+    public Order findById(long id) {
+        return orderRepository.findById(id).orElse(null);
+    }
 }
