@@ -47,6 +47,19 @@ public class OrderController {
         return "order/detail";
     }
 
+    // 내 주문 리스트 조회
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/list")
+    public String showList(Model model) {
+        Member buyer = rq.getMember();
+
+        List<Order> orders = orderService.findAllByBuyerId(buyer.getId());
+
+        model.addAttribute("orders", orders);
+
+        return "order/list";
+    }
+
     // 주문 생성 구현
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")

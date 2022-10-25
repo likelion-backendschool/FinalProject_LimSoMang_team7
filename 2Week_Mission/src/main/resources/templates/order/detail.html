@@ -36,7 +36,7 @@
 
                     <div class="my-2">
                         <i class="fa-solid fa-check"></i>
-                        주문날짜 : [[${order.createDate}]]
+                        주문날짜 : [[${#temporals.format(order.createDate, 'yyyy.MM.dd HH:mm')}]]
                     </div>
 
                     <div class="my-2">

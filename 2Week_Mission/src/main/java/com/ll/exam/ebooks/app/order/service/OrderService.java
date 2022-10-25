@@ -94,4 +94,8 @@ public class OrderService {
     public Order findById(long id) {
         return orderRepository.findById(id).orElse(null);
     }
+
+    public List<Order> findAllByBuyerId(Long id) {
+        return orderRepository.findAllByBuyerId(id);
+    }
 }
