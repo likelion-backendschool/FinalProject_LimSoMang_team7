@@ -4,6 +4,7 @@ import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.order.entity.Order;
+import com.ll.exam.ebooks.app.order.entity.OrderItem;
 import com.ll.exam.ebooks.app.order.service.OrderService;
 import com.ll.exam.ebooks.app.product.entity.Product;
 import com.ll.exam.ebooks.app.product.service.ProductService;
@@ -91,4 +92,20 @@ public class OrderController {
 
         return "redirect:/order/%d".formatted(order.getId());
     }
+
+    // 결제 처리 구현
+
+
+    // 주문 취소 구현
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/cancel")
+    public String cancelOrder(@PathVariable long id) {
+        Member buyer = rq.getMember();
+        Order order = orderService.findById(id);
+
+        orderService.cancelOrder(order);
+
+        return "redirect:/order/list";
+    }
+
 }

@@ -8,14 +8,12 @@ import com.ll.exam.ebooks.app.order.entity.OrderItem;
 import com.ll.exam.ebooks.app.order.repository.OrderItemRepository;
 import com.ll.exam.ebooks.app.order.repository.OrderRepository;
 import com.ll.exam.ebooks.app.product.entity.Product;
-import com.sun.mail.imap.OlderTerm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,6 +23,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
+    // 단일 상품 생성 로직
     @Transactional
     public Order createOrderByOne(Member buyer, Product product) {
         CartItem cartItem = cartService.getItemByBuyerAndProduct(buyer, product);
@@ -53,6 +52,7 @@ public class OrderService {
         return order;
     }
 
+    // 다중 상품 생성 로직
     @Transactional
     public Order createOrderByList(Member buyer, List<Product> products) {
         List<CartItem> cartItems = new ArrayList<>();
@@ -102,5 +102,13 @@ public class OrderService {
 
     public List<Order> findAllByBuyerId(Long id) {
         return orderRepository.findAllByBuyerId(id);
+    }
+
+    // 주문 취소 로직
+    @Transactional
+    public void cancelOrder(Order order) {
+        orderItemRepository.deleteAllByOrderId(order.getId());
+
+        orderRepository.delete(order);
     }
 }
