@@ -55,7 +55,12 @@ public class OrderService {
 
     @Transactional
     public Order createOrderByList(Member buyer, List<Product> products) {
-        List<CartItem> cartItems = cartService.getItemsByBuyer(buyer.getId());
+        List<CartItem> cartItems = new ArrayList<>();
+
+        products.forEach(product -> {
+            CartItem cartItem = cartService.getItemByBuyerAndProduct(buyer, product);
+            cartItems.add(cartItem);
+        });
 
         List<OrderItem> orderItems = new ArrayList<>();
 
