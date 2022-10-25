@@ -32,7 +32,12 @@ public interface InitDataBefore {
         postForm = new PostForm("test5", "## test5", "<h2>test5</h2>", "#test #user3");
         Post post5 = postService.write(member3, postForm);
 
-        ProductForm productForm = new ProductForm("1. product test1", 3000, "## 1. 안녕", "<h2>안녕</h2>", 1L, "#product #test1 #제노");
-        Product product = productService.create(member1, productForm);
+        ProductForm productForm = new ProductForm("neo", 5000, "## sticker", "<h2>sticker</h2>", 1L, "#sticker #nct #neo");
+        Product product1 = productService.create(member1, productForm);
+        productForm = new ProductForm("mark", 2000, "## child", "<h2>child</h2>", 3L, "#child #mark #canada");
+        Product product2 = productService.create(member2, productForm);
+        productForm = new ProductForm("dream", 2000, "## we go up", "<h2>we go up</h2>", 1L, "#beatbox #dream #world");
+        Product product3 = productService.create(member3, productForm);
+
     }
 }
