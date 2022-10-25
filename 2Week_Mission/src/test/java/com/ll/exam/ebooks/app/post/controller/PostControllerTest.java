@@ -177,19 +177,19 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 삭제 로직")
-    void delete() throws Exception {
+    void remove() throws Exception {
         // Given
         long id = 4;
 
         // When
         ResultActions resultActions = mvc
-                .perform(post("/post/%d/delete".formatted(id)))
+                .perform(post("/post/%d/remove".formatted(id)))
                 .andDo(print());
 
         // Then
         resultActions
                 .andExpect(status().is3xxRedirection())
                 .andExpect(handler().handlerType(PostController.class))
-                .andExpect(handler().methodName("delete"));
+                .andExpect(handler().methodName("remove"));
     }
 }

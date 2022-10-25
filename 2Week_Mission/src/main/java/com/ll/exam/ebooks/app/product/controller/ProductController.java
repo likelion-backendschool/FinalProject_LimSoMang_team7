@@ -1,6 +1,6 @@
 package com.ll.exam.ebooks.app.product.controller;
 
-import com.ll.exam.ebooks.app.base.exception.ActorCanNotDeleteException;
+import com.ll.exam.ebooks.app.base.exception.ActorCanNotRemoveException;
 import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.post.entity.Post;
@@ -111,17 +111,17 @@ public class ProductController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{id}/delete")
-    public String delete(@PathVariable long id) {
+    @PostMapping("/{id}/remove")
+    public String remove(@PathVariable long id) {
         Product product = productService.findById(id);
 
         Member actor = rq.getMember();
 
-        if (!productService.actorCanDelete(actor, product)) {
-            throw new ActorCanNotDeleteException();
+        if (!productService.actorCanRemove(actor, product)) {
+            throw new ActorCanNotRemoveException();
         }
 
-        productService.delete(product);
+        productService.remove(product);
 
         return "redirect:/product/list";
     }

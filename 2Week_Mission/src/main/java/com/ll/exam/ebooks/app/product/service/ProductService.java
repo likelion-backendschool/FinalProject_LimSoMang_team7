@@ -93,7 +93,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void delete(Product product) {
+    public void remove(Product product) {
         productRepository.delete(product);
 
         if (product.getHashTags() != null) {
@@ -114,7 +114,7 @@ public class ProductService {
     }
     // 상품 삭제 권한 여부 체크(권한: 작가 본인)
 
-    public boolean actorCanDelete(Member actor, Product product) {
+    public boolean actorCanRemove(Member actor, Product product) {
         return actorCanModify(actor, product);
     }
 }

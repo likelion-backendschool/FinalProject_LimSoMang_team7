@@ -127,15 +127,15 @@ public class PostController {
 
     // 글 삭제 구현
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{id}/delete")
-    public String delete(@PathVariable long id) {
+    @PostMapping("/{id}/remove")
+    public String remove(@PathVariable long id) {
         Member member = rq.getMember();
         Post post = postService.findById(id);
 
-        if (!postService.actorCanDelete(member, post)) {
+        if (!postService.actorCanRemove(member, post)) {
             throw new ActorCanNotModifyException();
         }
-        postService.delete(post);
+        postService.remove(post);
 
         return "redirect:/";
     }

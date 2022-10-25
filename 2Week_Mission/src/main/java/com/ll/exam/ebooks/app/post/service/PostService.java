@@ -90,7 +90,7 @@ public class PostService {
 
     // post가 삭제되면, post + postKeyword 연결 끊기
     @Transactional
-    public void delete(Post post) {
+    public void remove(Post post) {
         postRepository.delete(post);
 
         if (post.getHashTags() != null) {
@@ -104,7 +104,7 @@ public class PostService {
     }
 
     // 글 삭제 권한 여부 체크(권한: 글쓴이 본인)
-    public boolean actorCanDelete(Member actor, Post post) {
+    public boolean actorCanRemove(Member actor, Post post) {
         return actorCanModify(actor, post);
     }
 
