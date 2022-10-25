@@ -16,6 +16,7 @@ import java.util.List;
 public class CartService {
     private final CartItemRepository cartItemRepository;
 
+    // 장바구니에 상품 추가
     @Transactional
     public CartItem addCartItem(Member buyer, Product product) {
         // 1. 상품이 장바구니에 담겨 있는지 확인한다.
@@ -40,4 +41,13 @@ public class CartService {
     public List<CartItem> findByBuyerId(Long id) {
         return cartItemRepository.findAllByBuyerId(id);
     }
+
+    // 장바구니에서 상품 삭제
+    @Transactional
+    public void removeCartItem(Member buyer, Product product) {
+        CartItem cartItem = cartItemRepository.findByBuyerIdAndProductId(buyer.getId(), product.getId()).orElse(null);
+
+        cartItemRepository.delete(cartItem);
+    }
+
 }

@@ -50,4 +50,16 @@ public class CartController {
 
         return "redirect:/cart/list";
     }
+
+    // 장바구니에 있는 상품 삭제 구현
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/remove/{productId}")
+    public String removeCartItem(@PathVariable("productId") long id) {
+        Member buyer = rq.getMember();
+        Product product = productService.findById(id);
+
+        cartService.removeCartItem(buyer, product);
+
+        return "redirect:/cart/list";
+    }
 }
