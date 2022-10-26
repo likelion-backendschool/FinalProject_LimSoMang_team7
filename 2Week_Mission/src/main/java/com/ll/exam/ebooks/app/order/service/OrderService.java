@@ -7,7 +7,6 @@ import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.myBook.service.MyBookService;
 import com.ll.exam.ebooks.app.order.entity.Order;
 import com.ll.exam.ebooks.app.order.entity.OrderItem;
-import com.ll.exam.ebooks.app.order.entity.QOrder;
 import com.ll.exam.ebooks.app.order.exception.ActorCanNotPayOrderException;
 import com.ll.exam.ebooks.app.order.repository.OrderItemRepository;
 import com.ll.exam.ebooks.app.order.repository.OrderRepository;
@@ -53,6 +52,8 @@ public class OrderService {
         // 주문 품목으로부터 이름을 만든다.
         order.makeName();
 
+        // 주문 완료 처리
+        order.setReadyStatusDone();
         orderRepository.save(order);
 
         return order;
@@ -97,6 +98,8 @@ public class OrderService {
         // 주문 품목으로부터 이름을 만든다.
         order.makeName();
 
+        // 주문 완료 처리
+        order.setReadyStatusDone();
         orderRepository.save(order);
 
         return order;
@@ -131,8 +134,6 @@ public class OrderService {
 
         addPaidMyBooks(buyer, order);
     }
-
-
 
     // 결제완료된 상품을 내 도서에 추가
     @Transactional
@@ -202,6 +203,10 @@ public class OrderService {
     }
 
     public boolean actorCanCancel(Member actor, Order order) {
+        return actorCanSee(actor, order);
+    }
+
+    public boolean actorCanRefund(Member actor, Order order) {
         return actorCanSee(actor, order);
     }
 }
