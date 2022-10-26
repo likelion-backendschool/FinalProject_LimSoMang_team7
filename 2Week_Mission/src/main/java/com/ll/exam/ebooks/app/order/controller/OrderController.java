@@ -5,6 +5,8 @@ import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.order.entity.Order;
 import com.ll.exam.ebooks.app.order.entity.OrderItem;
+import com.ll.exam.ebooks.app.order.exception.ActorCanNotPayOrderException;
+import com.ll.exam.ebooks.app.order.exception.ActorCanNotSeeOrderException;
 import com.ll.exam.ebooks.app.order.service.OrderService;
 import com.ll.exam.ebooks.app.product.entity.Product;
 import com.ll.exam.ebooks.app.product.service.ProductService;
@@ -37,10 +39,14 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public String showDetail(@PathVariable long id, Model model) {
-        Member buyer = rq.getMember();
+        Member actor = rq.getMember();
         Order order = orderService.findById(id);
 
-        long restCash = memberService.getRestCash(buyer);
+        long restCash = memberService.getRestCash(actor);
+
+        if (!orderService.actorCanSee(actor, order)) {
+            throw new ActorCanNotSeeOrderException();
+        }
 
         model.addAttribute("order", order);
         model.addAttribute("actorRestCash", restCash);
@@ -52,9 +58,9 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/list")
     public String showList(Model model) {
-        Member buyer = rq.getMember();
+        Member actor = rq.getMember();
 
-        List<Order> orders = orderService.findAllByBuyerId(buyer.getId());
+        List<Order> orders = orderService.findAllByBuyerId(actor.getId());
 
         model.addAttribute("orders", orders);
 
@@ -66,13 +72,13 @@ public class OrderController {
     @PostMapping("/create")
     public String createOrder(@RequestParam(required = false) Long productId,
                               @RequestParam(required = false) String ids) {
-        Member buyer = rq.getMember();
+        Member actor = rq.getMember();
         Order order = null;
 
         // 1. 단일 상품 주문인지 아닌지 확인한다.
         if (productId != null) {
             Product product = productService.findById(productId);
-            order = orderService.createOrderByOne(buyer, product);
+            order = orderService.createOrderByOne(actor, product);
         }
 
         // 2. 단일 주문이 아니라면, ids를 처리한다.
@@ -87,14 +93,27 @@ public class OrderController {
                         products.add(product);
                     });
 
-            order = orderService.createOrderByList(buyer, products);
+            order = orderService.createOrderByList(actor, products);
         }
 
         return "redirect:/order/%d".formatted(order.getId());
     }
 
     // 결제 처리 구현
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/pay")
+    public String payByOrder(@PathVariable long id) {
+        Member actor = rq.getMember();
+        Order order = orderService.findById(id);
 
+        if (!orderService.actorCanPayment(actor, order)) {
+            throw new ActorCanNotPayOrderException();
+        }
+
+        orderService.payByRestCashOnly(order);
+
+        return "redirect:/order/%d".formatted(order.getId());
+    }
 
     // 주문 취소 구현
     @PreAuthorize("isAuthenticated()")

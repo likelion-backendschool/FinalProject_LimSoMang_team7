@@ -16,7 +16,7 @@
         const orderPayPrice = /*[[ ${order.calculatePayPrice} ]]*/ null;
     </script>
 
-<!--        <form hidden name="payByRestCashOnlyForm" method="POST" th:action="@{|/order/${order.id}/payByRestCashOnly|}"></form>-->
+        <form hidden name="payByRestCashOnlyForm" method="POST" th:action="@{|/order/${order.id}/pay|}"></form>
 
     <section class="section flex-grow flex flex-col items-center justify-center">
 
@@ -67,36 +67,45 @@
                             보유 예치금 : [[${actorRestCash}]]
                         </div>
 
-                        <div th:with="maxUseRestCash = ${order.calculatePayPrice > actorRestCash ? actorRestCash : order.calculatePayPrice}">
-                            <span class="mr-1">사용할 예치금 : </span>
-                            <input type="number" id="PaymentForm__useRestCash"
-                                   th:placeholder="|0 ~ ${maxUseRestCash}|"
-                                   class="input input-bordered min-w-[300px]" min="0" th:max="${maxUseRestCash}"
-                                   onkeydown="PaymentForm__useRestCashFix();"
-                                   onkeyup="PaymentForm__useRestCashFix();"
-                            >
-                            <label class="inline-flex items-center ml-3">
-                                <span>전액사용</span>
-                                <input onchange="PaymentForm__useRestCashAllChanged();" id="PaymentForm__useRestCashAll"
-                                       type="checkbox" class="ml-2 checkbox">
-                            </label>
-                        </div>
+                        <div th:if="${order.payable}">
+                            <div th:with="maxUseRestCash = ${order.calculatePayPrice > actorRestCash ? actorRestCash : order.calculatePayPrice}">
+                                <span class="mr-1">사용할 예치금 : </span>
+                                <input type="number" id="PaymentForm__useRestCash"
+                                       th:placeholder="|0 ~ ${maxUseRestCash}|"
+                                       class="input input-bordered min-w-[300px]" min="0" th:max="${maxUseRestCash}"
+                                       onkeydown="PaymentForm__useRestCashFix();"
+                                       onkeyup="PaymentForm__useRestCashFix();"
+                                >
+                                <label class="inline-flex items-center ml-3">
+                                    <span>전액 사용</span>
+                                    <input onchange="PaymentForm__useRestCashAllChanged();" id="PaymentForm__useRestCashAll"
+                                           type="checkbox" class="ml-2 checkbox">
+                                </label>
+                            </div>
 
-                        <div class="grid grid-cols-2 my-3 gap-2">
-                            <button th:if="${order.payable}" onclick="payment();" class="btn btn-mb btn-primary">
-                                <i class="fa-regular fa-credit-card"></i>
-                                <span class="ml-1">결제하기</span>
-                            </button>
-                            <a href="javascript:;" onclick="if ( confirm('주문을 취소하시겠습니까?') ) $(this).next().submit();"
-                               class="btn btn-secondary btn-mb btn-outline">
-                                <i class="fa-solid fa-trash"></i>
-                                <span class="ml-1">주문취소</span>
-                            </a>
-                            <form th:action="@{|/order/${order.id}/cancel|}" method="POST" hidden></form>
+                            <div class="grid grid-cols-2 my-3 gap-2">
+                                <button onclick="payment();" class="btn btn-mb btn-primary">
+                                    <i class="fa-regular fa-credit-card"></i>
+                                    <span class="ml-1">결제하기</span>
+                                </button>
+                                <a href="javascript:;" onclick="if ( confirm('주문을 취소하시겠습니까?') ) $(this).next().submit();"
+                                   class="btn btn-secondary btn-mb btn-outline">
+                                    <i class="fa-solid fa-trash"></i>
+                                    <span class="ml-1">주문취소</span>
+                                </a>
+                                <form th:action="@{|/order/${order.id}/cancel|}" method="POST" hidden></form>
+                            </div>
                         </div>
-                        <span th:if="${order.isPaid}">결제완료</span>
+                        <div th:if="${order.isPaid}" class="mt-2">
+                            <div class="badge badge-lg badge-secondary">결제완료</div>
+                            <div class="mt-3">
+                                결제 내역
+                                <div>결제방법</div>
+                                <div>결제가격</div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
+                    <div th:if="${order.payable}">
                         <div>
                             <span>PG결제가격 : </span>
                             <span id="PaymentForm__pgPayPriceDisplay">

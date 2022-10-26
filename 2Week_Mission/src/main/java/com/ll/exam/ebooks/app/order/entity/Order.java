@@ -86,4 +86,13 @@ public class Order extends BaseEntity {
 
         return true;
     }
+
+    public void setPaymentDone() {
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setPaymentDone();
+        }
+
+        isPaid = true;
+        payDate = orderItems.get(orderItems.size() - 1).getPayDate();
+    }
 }
