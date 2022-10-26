@@ -7,12 +7,12 @@ import com.ll.exam.ebooks.app.member.service.MemberService;
 import com.ll.exam.ebooks.app.myBook.service.MyBookService;
 import com.ll.exam.ebooks.app.order.entity.Order;
 import com.ll.exam.ebooks.app.order.entity.OrderItem;
+import com.ll.exam.ebooks.app.order.entity.QOrder;
 import com.ll.exam.ebooks.app.order.exception.ActorCanNotPayOrderException;
 import com.ll.exam.ebooks.app.order.repository.OrderItemRepository;
 import com.ll.exam.ebooks.app.order.repository.OrderRepository;
 import com.ll.exam.ebooks.app.product.entity.Product;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,46 +110,71 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
-    // 전액 예치금 결제
+    // 예치금으로 전액 결제
     @Transactional
     public void payByRestCashOnly(Order order) {
-        Member buyer = order.getBuyer();
+        Member buyer = order.getBuyer();            // 구매자
+        long restCash = buyer.getRestCash();        // 예치금 잔액
+        int payPrice = order.calculatePayPrice();   // 결제 금액
 
-        // 예치금
-        long restCash = buyer.getRestCash();
-
-        // 결제 금액
-        int payPrice = order.calculatePayPrice();
-
-        // 예치금이 결제 금액보다 적을 때
+        // 예치금이 결제 금액보다 적으면, 결제 거절
         if (payPrice > restCash) {
             throw new ActorCanNotPayOrderException("예치금이 부족합니다.");
         }
 
-        memberService.addCash(buyer, payPrice * -1, "%d번__상품결제".formatted(order.getId()));
+        // 예치금 결제 처리
+        memberService.addCash(buyer, payPrice * -1, "주문__%d__사용__예치금".formatted(order.getId()));
 
+        // 결제 완료 처리
         order.setPaymentDone();
         orderRepository.save(order);
 
         addPaidMyBooks(buyer, order);
     }
 
+
+
+    // 결제완료된 상품을 내 도서에 추가
     @Transactional
     public void addPaidMyBooks(Member buyer, Order order) {
+        // 단일 상품
         if (order.getOrderItems().size() == 1) {
             OrderItem orderItem = getOrderItemByOrderId(order.getId());
 
             myBookService.addPaidBook(buyer, orderItem.getProduct());
         }
 
+        // 다중 상품
         else {
             List<OrderItem> orderItems = getOrderItemsByOrderId(order.getId());
 
             for (OrderItem orderItem : orderItems) {
-                // 결제 완료된 상품을 내 도서에 추가
                 myBookService.addPaidBook(buyer, orderItem.getProduct());
             }
         }
+    }
+
+    // TossPayments 결제 (전액 결재 or 혼합 결제)
+    @Transactional
+    public void payByTossPayments(Order order, long useRestCash) {
+        Member buyer = order.getBuyer();            // 구매자
+        int payPrice = order.calculatePayPrice();   // 결제 금액
+        long pgPayPrice = payPrice - useRestCash;   // 카드 결제 금액
+
+        // 카드 결제 예치금 처리
+        memberService.addCash(buyer, pgPayPrice, "주문__%d__충전__토스페이먼츠".formatted(order.getId()));
+        memberService.addCash(buyer, pgPayPrice * -1, "주문__%d__사용__토스페이먼츠".formatted(order.getId()));
+
+        // 사용된 예치금 처리
+        if (useRestCash > 0) {
+            memberService.addCash(buyer, useRestCash * -1, "주문__%d__사용__예치금".formatted(order.getId()));
+        }
+
+        // 결제 완료 처리
+        order.setPaymentDone();
+        orderRepository.save(order);
+
+        addPaidMyBooks(buyer, order);
     }
 
     public Order findById(Long id) {
@@ -176,4 +201,7 @@ public class OrderService {
         return actorCanSee(actor, order);
     }
 
+    public boolean actorCanCancel(Member actor, Order order) {
+        return actorCanSee(actor, order);
+    }
 }

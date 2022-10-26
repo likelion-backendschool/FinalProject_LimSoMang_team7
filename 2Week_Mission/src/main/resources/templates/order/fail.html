@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>주문 결제실패</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-xl w-full px-2 pt-4">
+            <div>
+                주문 결제실패
+            </div>
+
+            <div>
+                주문번호 : [[${orderId}]]
+            </div>
+
+            <div>[[${message}]]</div>
+            <div>[[${code}]]</div>
+        </div>
+
+    </section>
+</main>
+</body>
+</html>
