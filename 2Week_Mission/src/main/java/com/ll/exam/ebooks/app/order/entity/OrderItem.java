@@ -64,4 +64,8 @@ public class OrderItem extends BaseEntity {
         this.isPaid = true;
         this.payDate = LocalDateTime.now();
     }
+
+    public void setRefundDone() {
+        this.refundPrice = payPrice;
+    }
 }

@@ -80,6 +80,16 @@ public class Order extends BaseEntity {
         return payPrice;
     }
 
+    public int getPayPrice() {
+        int payPrice = 0;
+
+        for(OrderItem orderItem : orderItems) {
+            payPrice += orderItem.getPayPrice();
+        }
+
+        return payPrice;
+    }
+
     public boolean isPayable() {
         if (isPaid) return false;
         if (isRefunded) return false;
@@ -94,5 +104,17 @@ public class Order extends BaseEntity {
 
         isPaid = true;
         payDate = orderItems.get(orderItems.size() - 1).getPayDate();
+    }
+
+    public void setReadyStatusDone() {
+        readyStatus = true;
+    }
+
+    public void setRefundDone() {
+        for (OrderItem orderItem : orderItems) {
+            orderItem.setRefundDone();
+        }
+
+        isRefunded = true;
     }
 }
