@@ -143,7 +143,7 @@ public class OrderController {
             throw new ActorCanNotRefundException();
         }
 
-//        orderService.refund(order);
+        orderService.refund(order);
 
         return "redirect:/order/list";
     }

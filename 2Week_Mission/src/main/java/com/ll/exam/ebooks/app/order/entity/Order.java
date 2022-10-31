@@ -36,6 +36,10 @@ public class Order extends BaseEntity {
 
     private LocalDateTime payDate; // 결제 날짜
 
+    private LocalDateTime cancelDate; // 취소 날짜
+
+    private LocalDateTime refundDate; // 환불 날짜
+
     private boolean readyStatus; // 주문 완료 여부
 
     private boolean isPaid; // 결제 완료 여부
@@ -97,6 +101,14 @@ public class Order extends BaseEntity {
         return true;
     }
 
+    public boolean isRefundable() {
+        if (!isPaid) return false;
+        if (isCanceled) return false;
+        if (isRefunded) return false;
+
+        return true;
+    }
+
     public void setPaymentDone() {
         for (OrderItem orderItem : orderItems) {
             orderItem.setPaymentDone();
@@ -104,6 +116,10 @@ public class Order extends BaseEntity {
 
         isPaid = true;
         payDate = orderItems.get(orderItems.size() - 1).getPayDate();
+    }
+
+    public void setCancelDate() {
+        cancelDate = LocalDateTime.now();
     }
 
     public void setReadyStatusDone() {
@@ -116,5 +132,11 @@ public class Order extends BaseEntity {
         }
 
         isRefunded = true;
+    }
+
+    public void setCancelDone() {
+        cancelDate = LocalDateTime.now();
+
+        isCanceled = true;
     }
 }

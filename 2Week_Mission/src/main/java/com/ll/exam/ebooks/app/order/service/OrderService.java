@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,6 +110,8 @@ public class OrderService {
     // 주문 취소 로직
     @Transactional
     public void cancelOrder(Order order) {
+        order.setCancelDate();
+
         orderItemRepository.deleteAllByOrderId(order.getId());
 
         orderRepository.delete(order);
@@ -178,6 +182,20 @@ public class OrderService {
         addPaidMyBooks(buyer, order);
     }
 
+    // 결제 상품 환불하기
+    @Transactional
+    public void refund(Order order) {
+        order.setCancelDone();
+
+        int payPrice = order.getPayPrice();
+        memberService.addCash(order.getBuyer(), payPrice, "주문__%d__환불__예치금".formatted(order.getId()));
+
+        order.setRefundDone();
+        orderRepository.save(order);
+
+        myBookService.remove(order);
+    }
+
     public Order findById(Long id) {
         return orderRepository.findById(id).orElse(null);
     }
@@ -207,6 +225,26 @@ public class OrderService {
     }
 
     public boolean actorCanRefund(Member actor, Order order) {
-        return actorCanSee(actor, order);
+        // 볼 수 있는 권한이 있는지
+        if (!actorCanSee(actor, order)) {
+            return false;
+        };
+
+        // 환불 가능한 상태인지
+        if (!order.isRefundable()) {
+            return false;
+        }
+
+        // 환불 가능한 시간대인지 구하기(10분 이내)
+        LocalDateTime payTime = order.getCreateDate();
+        LocalDateTime refundTime = LocalDateTime.now();
+
+        long between = ChronoUnit.MINUTES.between(payTime, refundTime);
+
+        if (between > 10) {
+            return false;
+        }
+
+        return true;
     }
 }
