@@ -236,10 +236,10 @@ public class OrderService {
         }
 
         // 환불 가능한 시간대인지 구하기(10분 이내)
-        LocalDateTime payTime = order.getCreateDate();
-        LocalDateTime refundTime = LocalDateTime.now();
+        LocalDateTime payTime = order.getPayDate();
+        LocalDateTime refundRequestTime = LocalDateTime.now();
 
-        long between = ChronoUnit.MINUTES.between(payTime, refundTime);
+        long between = ChronoUnit.MINUTES.between(payTime, refundRequestTime);
 
         if (between > 10) {
             return false;
