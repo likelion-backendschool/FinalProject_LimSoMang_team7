@@ -39,6 +39,6 @@ class HomeControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(handler().handlerType(HomeController.class))
                 .andExpect(handler().methodName("showMain"))
-                .andExpect(content().string(containsString("메인페이지")));
+                .andExpect(content().string(containsString("L I S T")));
     }
 }

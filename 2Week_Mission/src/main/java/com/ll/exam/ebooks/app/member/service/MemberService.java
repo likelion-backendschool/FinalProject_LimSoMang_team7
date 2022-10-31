@@ -1,5 +1,7 @@
 package com.ll.exam.ebooks.app.member.service;
 
+import com.ll.exam.ebooks.app.cash.entity.CashLog;
+import com.ll.exam.ebooks.app.cash.service.CashService;
 import com.ll.exam.ebooks.app.member.form.JoinForm;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.mail.service.MailService;
@@ -25,6 +27,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final CashService cashService;
 
 
     @Transactional
@@ -71,19 +74,20 @@ public class MemberService {
         return member;
     }
 
-    @Transactional(readOnly = true)
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElse(null);
     }
 
-    @Transactional(readOnly = true)
     public Member findByUsernameAndEmail(String username, String email) {
         return memberRepository.findByUsernameAndEmail(username, email).orElse(null);
     }
 
-    @Transactional(readOnly = true)
     public Member findByUsername(String username) {
         return memberRepository.findByUsername(username).orElse(null);
+    }
+
+    public Member findByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname).orElse(null);
     }
 
     @Transactional
@@ -96,15 +100,6 @@ public class MemberService {
         memberRepository.save(member);
 
         mailService.tempPasswordMailSend(member, tempPassword);
-    }
-
-    @Transactional
-    public void modify(String username, String email, String nickname) {
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("회원이 존재하지 않습니다."));
-
-        member.setEmail(email);
-        member.setNickname(nickname);
     }
 
     @Transactional
@@ -151,4 +146,21 @@ public class MemberService {
         SecurityContextHolder.setContext(context);
     }
 
+    @Transactional
+    public long addCash(Member member, long price, String eventType) {
+        CashLog cashLog = cashService.addCash(member, price, eventType);
+
+        // 예치금 변동 금액 반영
+        long newRestCash = member.getRestCash() + cashLog.getPrice();
+        member.setRestCash(newRestCash);
+        memberRepository.save(member);
+
+        return newRestCash;
+    }
+
+    public long getRestCash(Member member) {
+        Member _member = findByUsername(member.getUsername());
+
+        return _member.getRestCash();
+    }
 }

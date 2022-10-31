@@ -30,7 +30,7 @@ public class PostHashTag extends BaseEntity {
 
     @ManyToOne(fetch = LAZY)
     @ToString.Exclude
-    private Member member;
+    private Member author;
 
     @ManyToOne(fetch = LAZY)
     @ToString.Exclude

@@ -50,11 +50,11 @@
                     form.content.value = markdown;
                     form.contentHtml.value = html;
 
-                    form.hashTags.value = form.hashTags.value.trim();
+                    form.postHashTags.value = form.postHashTags.value.trim();
 
-                    if (form.hashTags.value.length == 0) {
+                    if (form.postHashTags.value.length == 0) {
                         warningModal("태그를 입력해주세요.");
-                        form.hashTags.focus();
+                        form.postHashTags.focus();
 
                         return;
                     }
@@ -87,7 +87,7 @@
                     <label class="label">
                         <span class="label-text">해시태그</span>
                     </label>
-                    <input type="text" name="hashTags" placeholder="#태그입력" class="input input-bordered">
+                    <input type="text" name="postHashTags" placeholder="#태그입력" class="input input-bordered">
                 </div>
 
                 <div class="grid mt-3">

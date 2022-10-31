@@ -1,7 +1,7 @@
 package com.ll.exam.ebooks.app.post.service;
 
 import com.ll.exam.ebooks.app.member.entity.Member;
-import com.ll.exam.ebooks.app.post.dto.PostForm;
+import com.ll.exam.ebooks.app.post.form.PostForm;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.exception.PostNotFoundException;
 import com.ll.exam.ebooks.app.post.repository.PostRepository;
@@ -23,6 +23,14 @@ public class PostService {
         return postRepository.findById(id).orElseThrow(() -> {
             throw new PostNotFoundException();
         });
+    }
+
+    public Post findByIdAndPostHashTagFindByPostId(long id) {
+        Post post = postRepository.findById(id).orElse(null);
+
+        post.setHashTags(postHashTagService.findByPostId(id));
+
+        return post;
     }
 
     // 전체 글 리스트 조회
@@ -54,12 +62,15 @@ public class PostService {
         postRepository.save(post);
 
         // hashTag 적용
-        String keywords = postForm.getHashTags();
-        if (keywords != null) {
-            postHashTagService.apply(post, keywords);
-        }
+        applyPostHashTags(post, postForm.getPostHashTags());
 
         return post;
+    }
+
+    // postHashTag 저장
+    @Transactional
+    public void applyPostHashTags(Post post, String postHashTags) {
+        postHashTagService.apply(post, postHashTags);
     }
 
     @Transactional
@@ -69,7 +80,7 @@ public class PostService {
         post.setContentHtml(postForm.getContentHtml());
 
         // 해시태그 적용
-        String keywords = postForm.getHashTags();
+        String keywords = postForm.getPostHashTags();
         if (keywords != null) {
             postHashTagService.apply(post, keywords);
         }
@@ -77,8 +88,9 @@ public class PostService {
         postRepository.save(post);
     }
 
+    // post가 삭제되면, post + postKeyword 연결 끊기
     @Transactional
-    public void delete(Post post) {
+    public void remove(Post post) {
         postRepository.delete(post);
 
         if (post.getHashTags() != null) {
@@ -87,19 +99,23 @@ public class PostService {
     }
 
     // 글 수정 권한 여부 체크(권한: 글쓴이 본인)
-    public boolean canModify(Member member, Post post) {
-        return member.getId().equals(post.getAuthor().getId());
+    public boolean actorCanModify(Member actor, Post post) {
+        return actor.getId().equals(post.getAuthor().getId());
     }
 
     // 글 삭제 권한 여부 체크(권한: 글쓴이 본인)
-    public boolean canDelete(Member member, Post post) {
-        return canModify(member, post);
+    public boolean actorCanRemove(Member actor, Post post) {
+        return actorCanModify(actor, post);
     }
 
     // 글 조회 권한 여부 체크(권한: 글쓴이 본인)
-    public boolean canSelect(Member member, Post post) {
-        return canModify(member, post);
+    public boolean actorCanSee(Member actor, Post post) {
+        return actorCanModify(actor, post);
     }
 
-
+    public Post findBySubject(String subject) {
+        return postRepository.findBySubject(subject).orElseThrow(() -> {
+            throw new PostNotFoundException();
+        });
+    }
 }

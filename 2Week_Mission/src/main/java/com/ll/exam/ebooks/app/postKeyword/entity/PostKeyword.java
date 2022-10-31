@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 @Entity
 @Getter
@@ -21,4 +22,7 @@ import javax.persistence.Entity;
 public class PostKeyword extends BaseEntity {
     @Column(unique = true)
     private String content;
+
+    @Transient
+    private Long postHashTagsCount;
 }

@@ -38,8 +38,10 @@ public class Member extends BaseEntity {
 
     private int authLevel;
 
+    private long restCash; // 예치금
+
     public String getName() {
-        if (nickname != null) {
+        if (nickname == null) {
             return username;
         }
         return nickname;

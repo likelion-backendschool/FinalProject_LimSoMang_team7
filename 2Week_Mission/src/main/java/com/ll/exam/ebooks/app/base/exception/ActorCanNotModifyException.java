@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.post.exception;
+package com.ll.exam.ebooks.app.base.exception;
 
 public class ActorCanNotModifyException extends RuntimeException {
 }

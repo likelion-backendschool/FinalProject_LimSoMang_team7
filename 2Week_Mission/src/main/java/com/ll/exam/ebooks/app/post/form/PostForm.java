@@ -1,4 +1,4 @@
-package com.ll.exam.ebooks.app.post.dto;
+package com.ll.exam.ebooks.app.post.form;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,5 +18,5 @@ public class PostForm {
     private String contentHtml;
 
     @NotEmpty
-    private String hashTags;
+    private String postHashTags;
 }

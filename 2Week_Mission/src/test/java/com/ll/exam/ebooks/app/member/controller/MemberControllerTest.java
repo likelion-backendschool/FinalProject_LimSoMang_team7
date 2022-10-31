@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -64,7 +65,8 @@ public class MemberControllerTest {
                 .perform(post("/member/join")
                         .with(csrf())
                         .param("username", "user100")
-                        .param("password", "1234")
+                        .param("password", "12345678")
+                        .param("passwordConfirm", "12345678")
                         .param("email", "user100@test.com")
                 )
                 .andDo(print());
@@ -77,6 +79,72 @@ public class MemberControllerTest {
                 .andExpect(redirectedUrl("/member/login"));
 
         assertThat(memberService.findByUsername("user100")).isNotNull();
+    }
+
+    @Test
+    @DisplayName("회원가입 로직: 아이디 중복 검사")
+    void joinFailByDuplicatedUsername() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf())
+                        .param("username", "user1")
+                        .param("password", "12345678")
+                        .param("passwordConfirm", "12345678")
+                        .param("email", "user100@test.com")
+                )
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(content().string(containsString("중복된 아이디입니다.")));
+    }
+
+    @Test
+    @DisplayName("회원가입 로직: 비밀번호 확인 검사")
+    void joinFailByNotMatchPassword() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf())
+                        .param("username", "user100")
+                        .param("password", "12345678")
+                        .param("passwordConfirm", "11111111")
+                        .param("email", "user100@test.com")
+                )
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(content().string(containsString("비밀번호가 일치하지 않습니다.")));
+    }
+
+    @Test
+    @DisplayName("회원가입 로직: 이메일 확인 검사")
+    void joinFailByDuplicatedEmail() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(post("/member/join")
+                        .with(csrf())
+                        .param("username", "user100")
+                        .param("password", "12345678")
+                        .param("passwordConfirm", "12345678")
+                        .param("email", "user1@test.com")
+                )
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(content().string(containsString("중복된 이메일입니다.")));
     }
 
     @Test
@@ -133,6 +201,25 @@ public class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("아이디 찾기 실패 로직")
+    void findUsernameFail() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(post("/member/findUsername")
+                        .with(csrf())
+                        .param("email", "user100@test.com")
+                )
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("findUsername"))
+                .andExpect(content().string(containsString("일치하는 회원이 존재하지 않습니다.")));
+    }
+
+    @Test
     @DisplayName("비밀번호 찾기 페이지")
     void showFindPassword() throws Exception {
         // When
@@ -148,7 +235,7 @@ public class MemberControllerTest {
                 .andExpect(content().string(containsString("비밀번호찾기")));
     }
 
-//    @Test // 강사님께 여쭤보고 구현하기
+    @Test
     @DisplayName("비밀번호 찾기 로직")
     void findPassword() throws Exception {
         // When
@@ -165,9 +252,29 @@ public class MemberControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("findPassword"))
-                .andExpect(redirectedUrl("/member/login"));
+                .andExpect(content().string(containsString("해당 이메일로 'user1' 계정의 임시 비밀번호를 발송했습니다.")));
 
         assertThat(memberService.findByUsername("user1")).isNotNull();
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기 실패 로직")
+    void findPasswordFail() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(post("/member/findPassword")
+                        .with(csrf())
+                        .param("username", "user100")
+                        .param("email", "user1@test.com")
+                )
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("findPassword"))
+                .andExpect(content().string(containsString("일치하는 회원이 존재하지 않습니다.")));
     }
 
     @Test
@@ -188,31 +295,29 @@ public class MemberControllerTest {
 
     @Test
     @WithUserDetails(value = "user1")
-    @DisplayName("프로필 수정 페이지")
-    void showModify() throws Exception {
+    @DisplayName("작가 등록 페이지")
+    void showBeAuthor() throws Exception {
         ResultActions resultActions = mvc
-                .perform(get("/member/modify"))
+                .perform(get("/member/beAuthor"))
                 .andDo(print());
 
         // Then
         resultActions
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(handler().handlerType(MemberController.class))
-                .andExpect(handler().methodName("showModify"))
-                .andExpect(content().string(containsString("프로필 수정")));
+                .andExpect(handler().methodName("showBeAuthor"))
+                .andExpect(content().string(containsString("작가 시작")));
     }
 
     @Test
-    @WithUserDetails(value = "user1")
-    @DisplayName("프로필 수정 로직")
-    void modify() throws Exception {
+    @WithUserDetails(value = "user4")
+    @DisplayName("작가 등록 로직")
+    void beAuthor() throws Exception {
         // When
         ResultActions resultActions = mvc
-                .perform(post("/member/modify")
+                .perform(post("/member/beAuthor")
                         .with(csrf())
-                        .param("username", "user1")
-                        .param("email", "user1@test.com")
-                        .param("nickname", "JENO")
+                        .param("nickname", "도영")
                 )
                 .andDo(print());
 
@@ -220,10 +325,32 @@ public class MemberControllerTest {
         resultActions
                 .andExpect(status().is3xxRedirection())
                 .andExpect(handler().handlerType(MemberController.class))
-                .andExpect(handler().methodName("modify"))
+                .andExpect(handler().methodName("beAuthor"))
                 .andExpect(redirectedUrl("/member/profile"));
 
-        assertThat(memberService.findByUsername("user1").getNickname()).isEqualTo("JENO");
+        assertThat(memberService.findByUsername("user4").getNickname()).isEqualTo("도영");
+    }
+
+    @Test
+    @WithUserDetails(value = "user4")
+    @DisplayName("작가 등록 로직 실패: 사용 중인 닉네임")
+    void beAuthorFailByDuplicatedNickname() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(post("/member/beAuthor")
+                        .with(csrf())
+                        .param("nickname", "해찬")
+                )
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is3xxRedirection())
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("beAuthor"))
+                .andExpect(redirectedUrlPattern("/member/beAuthor?msg=**"));
+
+        assertThat(memberService.findByNickname("마크")).isNotNull();
     }
 
     @Test
@@ -251,7 +378,8 @@ public class MemberControllerTest {
                 .perform(post("/member/modifyPassword")
                         .with(csrf())
                         .param("username", "user1")
-                        .param("password", "5678")
+                        .param("oldPassword", "1234")
+                        .param("password", "12345678")
                 )
                 .andDo(print());
 
@@ -262,7 +390,29 @@ public class MemberControllerTest {
                 .andExpect(handler().methodName("modifyPassword"))
                 .andExpect(redirectedUrl("/member/profile"));
 
-        assertThat(passwordEncoder.matches("5678", memberService.findByUsername("user1").getPassword())).isTrue();
+        assertThat(passwordEncoder.matches("12345678", memberService.findByUsername("user1").getPassword())).isTrue();
+    }
+
+    @Test
+    @WithUserDetails(value = "user1")
+    @DisplayName("비밀번호 변경 실패 로직")
+    void modifyPasswordFailByNotMatch() throws Exception {
+        // When
+        ResultActions resultActions = mvc
+                .perform(post("/member/modifyPassword")
+                        .with(csrf())
+                        .param("username", "user1")
+                        .param("oldPassword", "1111")
+                        .param("password", "12345678")
+                )
+                .andDo(print());
+
+        // Then
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(handler().handlerType(MemberController.class))
+                .andExpect(handler().methodName("modifyPassword"))
+                .andExpect(content().string(containsString("현재 비밀번호를 잘못 입력했습니다.")));
     }
 
 }

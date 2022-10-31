@@ -2,9 +2,9 @@ package com.ll.exam.ebooks.app.post.controller;
 
 import com.ll.exam.ebooks.app.base.rq.Rq;
 import com.ll.exam.ebooks.app.member.entity.Member;
-import com.ll.exam.ebooks.app.post.dto.PostForm;
+import com.ll.exam.ebooks.app.post.form.PostForm;
 import com.ll.exam.ebooks.app.post.entity.Post;
-import com.ll.exam.ebooks.app.post.exception.ActorCanNotModifyException;
+import com.ll.exam.ebooks.app.base.exception.ActorCanNotModifyException;
 import com.ll.exam.ebooks.app.post.service.PostService;
 import com.ll.exam.ebooks.app.postHashTag.service.PostHashTagService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class PostController {
             return "redirect:/member/beAuthor";
         }
 
-        return "/post/write";
+        return "post/write";
     }
 
     // 글 작성
@@ -51,6 +51,9 @@ public class PostController {
         Member author = rq.getMember();
 
         Post post = postService.write(author, postForm);
+
+        System.out.println("post : " + post);
+
 
         return "redirect:/post/%d".formatted(post.getId());
     }
@@ -64,9 +67,8 @@ public class PostController {
 
         post.setHashTags(postHashTagService.findByPostId(id));
 
-        log.debug("post : " + post);
         // 조회 권한 검사
-        if (postService.canSelect(member, post) == false) {
+        if (postService.actorCanSee(member, post) == false) {
             throw new ActorCanNotModifyException();
         }
 
@@ -98,7 +100,7 @@ public class PostController {
         Post post = postService.findById(id);
 
         // 수정 권한 검사
-        if (!postService.canModify(member, post)) {
+        if (!postService.actorCanModify(member, post)) {
             throw new ActorCanNotModifyException();
         }
         model.addAttribute("post", post);
@@ -115,7 +117,7 @@ public class PostController {
         Post post = postService.findById(id);
 
         // 수정 권한 검사
-        if (!postService.canModify(member, post)) {
+        if (!postService.actorCanModify(member, post)) {
             throw new ActorCanNotModifyException();
         }
         postService.modify(post, postForm);
@@ -125,15 +127,15 @@ public class PostController {
 
     // 글 삭제 구현
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{id}/delete")
-    public String delete(@PathVariable long id) {
+    @PostMapping("/{id}/remove")
+    public String remove(@PathVariable long id) {
         Member member = rq.getMember();
         Post post = postService.findById(id);
 
-        if (!postService.canDelete(member, post)) {
+        if (!postService.actorCanRemove(member, post)) {
             throw new ActorCanNotModifyException();
         }
-        postService.delete(post);
+        postService.remove(post);
 
         return "redirect:/";
     }
