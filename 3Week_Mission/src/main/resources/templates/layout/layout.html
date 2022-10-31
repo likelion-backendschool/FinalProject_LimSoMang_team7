@@ -109,12 +109,40 @@
                     signup
                 </span>
             </a>
-            <a href="/member/profile" class="btn btn-ghost rounded-btn" sec:authorize="isAuthenticated()">
-                <i class="fa-solid fa-user"></i>
-                <span class="ml-[2px] hidden sm:block">
-                    profile
-                </span>
-            </a>
+            <div class="dropdown dropdown-hover" sec:authorize="isAuthenticated()">
+                <label tabindex="0" class="btn btn-ghost rounded-btn">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="ml-[2px] hidden sm:block">
+                        myPage
+                    </span>
+                </label>
+                <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
+                    <li>
+                        <a href="/member/profile" class="btn btn-ghost rounded-btn" sec:authorize="isAuthenticated()">
+                            <i class="fa-solid fa-user"></i>
+                            <span class="ml-[2px] hidden sm:block">
+                                profile
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/cart/list" class="btn btn-ghost rounded-btn" sec:authorize="isAuthenticated()">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span class="ml-[2px] hidden sm:block">
+                                cart
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/order/list" class="btn btn-ghost rounded-btn" sec:authorize="isAuthenticated()">
+                            <i class="fa-solid fa-list-ul"></i>
+                            <span class="ml-[2px] hidden sm:block">
+                                orderList
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <a href="javascript: document.logoutForm.submit();" class="btn btn-ghost rounded-btn" sec:authorize="isAuthenticated()">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span class="ml-[2px] hidden sm:block">
