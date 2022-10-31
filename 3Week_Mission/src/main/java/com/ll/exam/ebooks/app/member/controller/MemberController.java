@@ -5,7 +5,7 @@ import com.ll.exam.ebooks.app.member.form.JoinForm;
 import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.form.ModifyPasswordForm;
 import com.ll.exam.ebooks.app.member.service.MemberService;
-import com.ll.exam.ebooks.app.util.Ut;
+import com.ll.exam.ebooks.util.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
