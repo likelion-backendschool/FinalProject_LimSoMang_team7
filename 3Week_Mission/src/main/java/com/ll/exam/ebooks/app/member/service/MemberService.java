@@ -158,6 +158,18 @@ public class MemberService {
         return newRestCash;
     }
 
+    @Transactional
+    public CashLog addCashReturnCashLog(Member member, long price, String eventType) {
+        CashLog cashLog = cashService.addCash(member, price, eventType);
+
+        // 예치금 변동 금액 반영
+        long newRestCash = member.getRestCash() + cashLog.getPrice();
+        member.setRestCash(newRestCash);
+        memberRepository.save(member);
+
+        return cashLog;
+    }
+
     public long getRestCash(Member member) {
         Member _member = findByUsername(member.getUsername());
 
