@@ -30,6 +30,14 @@ public class Ut {
         public static LocalDateTime parse(String dateText) {
             return parse("yyyy-MM-dd HH:mm:ss.SSSSSS", dateText);
         }
+
+        public static String format(String pattern, LocalDateTime dateTime) {
+            return dateTime.format(DateTimeFormatter.ofPattern(pattern));
+        }
+
+        public static String format(LocalDateTime dateTime) {
+            return format("yyyy-MM-dd HH:mm:ss.SSSSSS", dateTime);
+        }
     }
 
     public static class url {
