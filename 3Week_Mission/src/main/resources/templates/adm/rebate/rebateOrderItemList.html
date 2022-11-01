@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html layout:decorate="~{adm/layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Order</title>
+</head>
+
+<body>
+<main layout:fragment="main">
+    <section class="section flex-grow flex flex-col items-center justify-center">
+
+        <div class="max-w-3xl w-full px-2 pt-4">
+            <h1 class="font-bold text-2xl text-center mb-5">정산데이터 내역</h1>
+
+            <div class="overflow-x-auto">
+                <table class="table w-full">
+                    <!-- head -->
+                    <thead>
+                    <tr>
+                        <th>주문번호</th>
+                        <th>제목</th>
+                        <th>주문가격</th>
+                        <th>주문날짜</th>
+                        <th>결제상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="order : ${orders}">
+                        <tr class="hover">
+                            <th th:text="${order.id}"></th>
+                            <td>
+                                <a th:href="|/order/${order.id}|" th:text="${order.name}"></a>
+                            </td>
+                            <td th:text="${order.calculatePayPrice}"></td>
+                            <td th:text="${#temporals.format(order.createDate, 'yy.MM.dd HH:mm')}"></td>
+                            <td th:if="${order.isPaid}" th:text="결제완료"></td>
+                            <td th:unless="${order.isPaid}" th:text="결제대기"></td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+</main>
+</body>
+</html>
