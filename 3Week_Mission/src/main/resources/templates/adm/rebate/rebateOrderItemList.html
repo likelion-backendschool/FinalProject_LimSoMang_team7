@@ -32,7 +32,10 @@
                     <!-- head -->
                     <thead>
                     <tr>
-                        <th></th>
+                        <th>
+                            <input type="checkbox" class="orderItemCheckboxAll checkbox checkbox-secondary">
+                        </th>
+                        <th>주문품목번호</th>
                         <th>결제날짜</th>
                         <th>상품명</th>
                         <th>결제가격</th>
@@ -47,6 +50,9 @@
                     <tbody>
                     <th:block th:each="item : ${items}">
                         <tr>
+                            <td>
+                                <input type="checkbox" onchange="OrderItemCheckbox__changed();" th:if="${item.rebateAvailable}" class="orderItemCheckbox checkbox checkbox-secondary">
+                            </td>
                             <td th:text="${item.orderItem.id}"></td>
                             <td th:text="${#temporals.format(item.payDate, 'yy.MM.dd HH:mm')}"></td>
                             <td th:text="${item.productSubject}"></td>
@@ -59,12 +65,33 @@
                                 <span th:text="${item.rebateCashLog?.id}"></span>
                             </td>
                             <td>
-                                <a th:if="${item.rebateAvailable}" href="javascript:;" onclick="$(this).next().submit();" class="btn btn-xs">건별정산</a>
+                                <a th:if="${item.rebateAvailable}" href="javascript:;" onclick="$(this).next().submit();" class="btn btn-primary btn-outline btn-xs">건별정산</a>
                                 <form method="POST" th:action="@{|/adm/rebate/rebateOne/${item.orderItem.id}|}" target="_blank" hidden></form>
                         </tr>
                     </th:block>
                     </tbody>
                 </table>
+                <div>
+                    <a href="" class="btn btn-primary btn-sm text-right">선택정산</a>
+                </div>
+
+                <script>
+                    // 전체선택 체크박스
+                    const $orderItemCheckboxAll = $('.orderItemCheckboxAll');
+                    /// 아이템 체크박스
+                    const $orderItemCheckbox = $('.orderItemCheckbox');
+
+                    $orderItemCheckboxAll.change(function() {
+                        const allChecked = $(this).prop('checked');
+                        $orderItemCheckbox.prop('checked', allChecked); // 아이템 체크박스들에게 체크상태 동기화
+                    });
+
+                    function OrderItemCheckbox__changed() {
+                        const allChecked = $orderItemCheckbox.length == $('.orderItemCheckbox::checked').length;
+
+                        $orderItemCheckboxAll.prop('checked', allChecked);
+                    }
+                </script>
             </div>
         </div>
 
