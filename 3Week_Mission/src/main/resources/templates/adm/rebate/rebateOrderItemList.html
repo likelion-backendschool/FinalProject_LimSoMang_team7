@@ -7,34 +7,59 @@
 
 <body>
 <main layout:fragment="main">
-    <section class="section flex-grow flex flex-col items-center justify-center">
+    <div class="container mx-auto my-auto">
 
-        <div class="max-w-3xl w-full px-2 pt-4">
+        <div class="overflow-x-auto">
             <h1 class="font-bold text-2xl text-center mb-5">정산데이터 내역</h1>
+
+            <form th:action>
+                <div class="form-control mb-3">
+                    <label class="input-group input-group-sm justify-end">
+                        <select name="yearMonth" class="select select-bordered select-sm">
+                            <option disabled selected>which one</option>
+                            <option value="2022-11">2022-11</option>
+                            <option value="2022-10">2022-10</option>
+                            <option value="2022-09">2022-09</option>
+                        </select>
+
+                        <input class="btn btn-primary btn-sm" type="submit" value="생성">
+                    </label>
+                </div>
+            </form>
 
             <div class="overflow-x-auto">
                 <table class="table w-full">
                     <!-- head -->
                     <thead>
                     <tr>
-                        <th>주문번호</th>
-                        <th>제목</th>
-                        <th>주문가격</th>
-                        <th>주문날짜</th>
-                        <th>결제상태</th>
+                        <th></th>
+                        <th>결제날짜</th>
+                        <th>상품명</th>
+                        <th>결제가격</th>
+                        <th>PG FEE</th>
+                        <th>환불가격</th>
+                        <th>판매자</th>
+                        <th>예상정산가</th>
+                        <th>정산내역번호</th>
+                        <th>비고</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <th:block th:each="order : ${orders}">
-                        <tr class="hover">
-                            <th th:text="${order.id}"></th>
+                    <th:block th:each="item : ${items}">
+                        <tr>
+                            <td th:text="${item.orderItem.id}"></td>
+                            <td th:text="${#temporals.format(item.payDate, 'yy.MM.dd HH:mm')}"></td>
+                            <td th:text="${item.productSubject}"></td>
+                            <td th:text="${item.payPrice}"></td>
+                            <td th:text="${item.pgFee}"></td>
+                            <td th:text="${item.refundPrice}"></td>
+                            <td th:text="${item.sellerName}"></td>
+                            <td th:text="${item.calculateRebatePrice}"></td>
+                            <td th:text="${item.rebateCashLog?.id}"></td>
                             <td>
-                                <a th:href="|/order/${order.id}|" th:text="${order.name}"></a>
+                                <a th:if="${item.rebateAvailable}" href="javascript:;" onclick="$(this).next().submit();" class="btn btn-xs">건별정산</a>
+                                <form method="POST" th:action="@{|/adm/rebate/rebateOne/${item.orderItem.id}|}" target="_blank" hidden></form>
                             </td>
-                            <td th:text="${order.calculatePayPrice}"></td>
-                            <td th:text="${#temporals.format(order.createDate, 'yy.MM.dd HH:mm')}"></td>
-                            <td th:if="${order.isPaid}" th:text="결제완료"></td>
-                            <td th:unless="${order.isPaid}" th:text="결제대기"></td>
                         </tr>
                     </th:block>
                     </tbody>
@@ -42,7 +67,7 @@
             </div>
         </div>
 
-    </section>
+    </div>
 </main>
 </body>
 </html>
