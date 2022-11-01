@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,5 +88,16 @@ public class RebateService {
         CashLog cashLog = memberService.addCashReturnCashLog(rebateOrderItem.getProduct().getAuthor(), calculateRebatePrice, "정산__%d__지급__예치금".formatted(rebateOrderItem.getOrderItem().getId()));
 
         rebateOrderItem.setRebateDone(cashLog.getId());
+    }
+
+    @Transactional
+    public void selectRebate(String ids) {
+        String[] idsArr = ids.split(",");
+
+        Arrays.stream(idsArr)
+                .mapToLong(Long::parseLong)
+                .forEach(id -> {
+                    rebate(id);
+                });
     }
 }

@@ -2,7 +2,9 @@ package com.ll.exam.ebooks.app.rebate.controller;
 
 import com.ll.exam.ebooks.app.rebate.entity.RebateOrderItem;
 import com.ll.exam.ebooks.app.rebate.service.RebateService;
+import com.ll.exam.ebooks.util.Ut;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,11 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
 @RequestMapping("/adm/rebate")
 @RequiredArgsConstructor
+@Slf4j
 public class AdmRebateController {
     private final RebateService rebateService;
 
@@ -53,5 +57,22 @@ public class AdmRebateController {
         rebateService.rebate(orderItemId);
 
         return "redirect:/adm/rebate/rebateOrderItemList";
+    }
+
+    @PreAuthorize("isAuthenticated() and hasAuthority('ADMIN')")
+    @PostMapping("/rebate")
+    public String rebate(String ids, HttpServletRequest req) {
+        rebateService.selectRebate(ids);
+
+        String referer = req.getHeader("Referer");
+        String yearMonth = Ut.url.getParamValue(referer, "yearMonth", "");
+
+        String redirect = "redirect:/adm/rebate/rebateOrderItemList";
+
+        if (yearMonth != null) {
+            redirect = "redirect:/adm/rebate/rebateOrderItemList?yearMonth=" + yearMonth;
+        }
+
+        return redirect;
     }
 }

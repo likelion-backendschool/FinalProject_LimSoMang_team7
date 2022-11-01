@@ -51,7 +51,8 @@
                     <th:block th:each="item : ${items}">
                         <tr>
                             <td>
-                                <input type="checkbox" onchange="OrderItemCheckbox__changed();" th:if="${item.rebateAvailable}" class="orderItemCheckbox checkbox checkbox-secondary">
+                                <input type="checkbox" onchange="OrderItemCheckbox__changed();" th:if="${item.rebateAvailable}"
+                                       class="orderItemCheckbox checkbox checkbox-secondary" th:value="${item.orderItem.id}">
                             </td>
                             <td th:text="${item.orderItem.id}"></td>
                             <td th:text="${#temporals.format(item.payDate, 'yy.MM.dd HH:mm')}"></td>
@@ -73,7 +74,9 @@
                 </table>
                 <div>
                     <a href="javascript:;" onclick="RebateForm__submit();" class="btn btn-primary btn-sm text-right">선택정산</a>
-                    <form method="POST" name="rebateForm" th:action="@{|/adm/rebate/rebate|}" hidden></form>
+                    <form method="POST" name="rebateForm" th:action="@{|/adm/rebate/rebate|}" hidden>
+                        <input type="hidden" name="ids">
+                    </form>
                 </div>
 
                 <script>
@@ -106,6 +109,9 @@
                             alert('정산할 주문품목을 선택해주세요.');
                             return;
                         }
+
+                        const ids = $checked.map((index, el) => $(el).val()).get();
+                        form.ids.value = ids;
 
                         form.submit();
                         RebateForm__submitDone = true;
