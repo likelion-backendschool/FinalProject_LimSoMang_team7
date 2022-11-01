@@ -29,7 +29,7 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-@Table(name = "proudct_order")
+@Table(name = "product_order")
 public class Order extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     private Member buyer;

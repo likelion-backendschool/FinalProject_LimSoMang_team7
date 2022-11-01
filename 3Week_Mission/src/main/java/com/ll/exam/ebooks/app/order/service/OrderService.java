@@ -247,4 +247,8 @@ public class OrderService {
 
         return true;
     }
+
+    public List<OrderItem> findAllByPayDateBetween(LocalDateTime fromDate, LocalDateTime toDate) {
+        return orderItemRepository.findAllByPayDateBetween(fromDate, toDate);
+    }
 }
