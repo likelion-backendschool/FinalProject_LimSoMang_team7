@@ -5,10 +5,6 @@ import com.ll.exam.ebooks.app.member.repository.MemberRepository;
 import com.ll.exam.ebooks.app.post.entity.Post;
 import com.ll.exam.ebooks.app.post.form.PostForm;
 import com.ll.exam.ebooks.app.post.repository.PostRepository;
-import com.ll.exam.ebooks.app.postHashTag.entity.PostHashTag;
-import com.ll.exam.ebooks.app.postHashTag.repository.PostHashTagRepository;
-import com.ll.exam.ebooks.app.postHashTag.service.PostHashTagService;
-import com.ll.exam.ebooks.app.postKeyword.entity.PostKeyword;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +13,6 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -110,7 +105,6 @@ class PostServiceTest {
         // When
         Post _post = postService.write(author, postForm);
         Post post = postService.findBySubject("test100");
-        System.out.println("post: " + post);
 
         // Then
         assertEquals(post.getAuthor(), author);
