@@ -1,5 +1,6 @@
 package com.ll.exam.ebooks.util;
 
+import com.ll.exam.ebooks.app.base.dto.RsData;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +11,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Ut {
     public static class spring {
-        public static <T> ResponseEntity<T> responseEntityOf(HttpHeaders headers) {
-            return new ResponseEntity<>(null, headers, HttpStatus.OK);
+        public static <T> ResponseEntity<T> responseEntityOf(RsData<T> rsData) {
+            return responseEntityOf(rsData, null);
+        }
+
+        public static <T> ResponseEntity<T> responseEntityOf(RsData<T> rsData, HttpHeaders headers) {
+            return new ResponseEntity<>(null, headers, rsData.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         }
     }
 
