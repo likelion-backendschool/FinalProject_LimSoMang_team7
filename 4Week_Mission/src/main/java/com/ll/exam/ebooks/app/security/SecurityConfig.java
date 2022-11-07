@@ -24,7 +24,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .cors().disable() // 타 도메인에서 API 호출 가능
+                .csrf().disable() // CSRF 토큰 끄기
                 .formLogin(
                         formLogin -> formLogin
                                 .loginPage("/member/login")
