@@ -76,7 +76,7 @@ public class ProductController {
     }
 
     // 상품 수정 폼
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHOR')")
     @GetMapping("/{id}/modify")
     public String showModify(@PathVariable long id, Model model) {
         Product product = productService.findById(id);
@@ -94,7 +94,7 @@ public class ProductController {
     }
 
     // 상품 수정 로직 구현
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHOR')")
     @PostMapping("/{id}/modify")
     public String modify(@PathVariable long id, @Valid ProductModifyForm productModifyForm) {
         Product product = productService.findById(id);
@@ -110,7 +110,7 @@ public class ProductController {
         return "redirect:/product/" + product.getId();
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() and hasAuthority('AUTHOR')")
     @PostMapping("/{id}/remove")
     public String remove(@PathVariable long id) {
         Product product = productService.findById(id);

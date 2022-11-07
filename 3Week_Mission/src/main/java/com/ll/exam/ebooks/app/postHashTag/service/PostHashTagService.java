@@ -58,7 +58,8 @@ public class PostHashTagService {
     }
 
     // 해시태그 저장
-    private PostHashTag save(Post post, String keywordContent) {
+    @Transactional
+    public PostHashTag save(Post post, String keywordContent) {
         // 1. keyword 저장 및 가져오기
         PostKeyword keyword = postKeywordService.save(keywordContent);
 

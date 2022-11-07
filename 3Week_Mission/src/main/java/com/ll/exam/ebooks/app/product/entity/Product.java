@@ -76,7 +76,7 @@ public class Product extends BaseEntity {
 
     // 도매가(대행사가 가져가는 금액)
     public int getWholesalePrice() {
-        return (int) Math.ceil(getPrice() * 0.7);
+        return (int) Math.ceil(getPrice() * 0.5);
     }
 
     // 주문 가능 여부
