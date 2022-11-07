@@ -1,6 +1,9 @@
 package com.ll.exam.ebooks.app.api.controller;
 
+import com.ll.exam.ebooks.app.member.entity.Member;
 import com.ll.exam.ebooks.app.member.form.LoginForm;
+import com.ll.exam.ebooks.app.member.service.MemberService;
+import com.ll.exam.ebooks.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,14 +20,20 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class ApiController {
 
+    private final MemberService memberService;
+
     @PostMapping("/member/login")
     public ResponseEntity<String> login(@RequestBody LoginForm loginForm) {
+        Member member = memberService.findByUsername(loginForm.getUsername());
+
+        if (member == null) {
+            return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
+        }
+
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authentication", "JWT token");
+        headers.set("Authentication", "JWT_Access_Token");
 
-        String body = "username : %s, password : %s".formatted(loginForm.getUsername(), loginForm.getPassword());
-
-        return new ResponseEntity<>(body, headers, HttpStatus.OK);
+        return Ut.spring.responseEntityOf(headers);
     }
 
 }

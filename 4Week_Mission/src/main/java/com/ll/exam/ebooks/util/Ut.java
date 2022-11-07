@@ -1,5 +1,9 @@
 package com.ll.exam.ebooks.util;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
@@ -8,6 +12,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 public class Ut {
+    public static class spring {
+        public static <T> ResponseEntity<T> responseEntityOf(HttpHeaders headers) {
+            return new ResponseEntity<>(null, headers, HttpStatus.OK);
+        }
+    }
+
     public static class date {
         public static int getEndDayOf(int year, int month) {
             String yearMonth = year + "-" + "%02d".formatted(month);
