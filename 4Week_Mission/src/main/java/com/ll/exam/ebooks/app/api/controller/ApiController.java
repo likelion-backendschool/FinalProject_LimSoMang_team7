@@ -31,7 +31,7 @@ public class ApiController {
             return Ut.spring.responseEntityOf(RsData.of("F-1", "일치하는 회원이 존재하지 않습니다."));
         }
 
-        String accessToken = "JWT_Access_Token";
+        String accessToken = memberService.genAccessToken(member);
 
         return Ut.spring.responseEntityOf(
                 RsData.of(
