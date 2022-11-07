@@ -34,12 +34,25 @@ public class Ut {
     }
 
     public static class spring {
-        public static <T> ResponseEntity<T> responseEntityOf(RsData<T> rsData) {
+        public static <T> ResponseEntity<RsData> responseEntityOf(RsData<T> rsData) {
             return responseEntityOf(rsData, null);
         }
 
-        public static <T> ResponseEntity<T> responseEntityOf(RsData<T> rsData, HttpHeaders headers) {
-            return new ResponseEntity<>(null, headers, rsData.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+        public static <T> ResponseEntity<RsData> responseEntityOf(RsData<T> rsData, HttpHeaders headers) {
+            return new ResponseEntity<>(rsData, headers, rsData.isSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+        }
+
+        public static HttpHeaders httpHeadersOf(String... args) {
+            HttpHeaders headers = new HttpHeaders();
+
+            Map<String, String> map = Ut.mapOf(args);
+
+            for (String key : map.keySet()) {
+                String value = map.get(key);
+                headers.set(key, value);
+            }
+
+            return headers;
         }
     }
 
