@@ -2,6 +2,7 @@ package com.ll.exam.ebooks.app.member.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ll.exam.ebooks.app.base.entity.BaseEntity;
+import com.ll.exam.ebooks.util.Ut;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -36,10 +38,13 @@ public class Member extends BaseEntity {
 
     private String nickname;
 
+    @JsonIgnore
     private int authLevel;
 
+    @JsonIgnore
     private long restCash; // 예치금
 
+    @JsonIgnore
     public String getName() {
         if (nickname == null) {
             return username;
@@ -51,6 +56,7 @@ public class Member extends BaseEntity {
         super(id);
     }
 
+    @JsonIgnore
     public List<GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("MEMBER"));
@@ -64,5 +70,18 @@ public class Member extends BaseEntity {
         }
 
         return authorities;
+    }
+
+    @JsonIgnore
+    public Map<String, Object> getAccessTokenClaims() {
+        return Ut.mapOf(
+                "id", getId(),
+                "createDate", getCreateDate(),
+                "modifyDate", getModifyDate(),
+                "username", getUsername(),
+                "email", getEmail(),
+                "authLevel", getAuthLevel(),
+                "authorities", getAuthorities()
+        );
     }
 }

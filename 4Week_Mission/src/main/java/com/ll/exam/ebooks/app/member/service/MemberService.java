@@ -9,6 +9,7 @@ import com.ll.exam.ebooks.app.member.exception.AlreadyJoinException;
 import com.ll.exam.ebooks.app.member.exception.MemberNotFoundException;
 import com.ll.exam.ebooks.app.member.repository.MemberRepository;
 import com.ll.exam.ebooks.app.security.dto.MemberContext;
+import com.ll.exam.ebooks.app.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -28,6 +29,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final CashService cashService;
+    private final JwtProvider jwtProvider;
 
 
     @Transactional
@@ -72,6 +74,10 @@ public class MemberService {
         mailService.joinMailSend(member);
 
         return member;
+    }
+
+    public String genAccessToken(Member member) {
+        return jwtProvider.generatedAccessToken(member.getAccessTokenClaims(), 60 * 60 * 24 * 90);
     }
 
     public Member findByEmail(String email) {
@@ -132,7 +138,7 @@ public class MemberService {
     }
 
     private void forceAuthentication(Member member) {
-        MemberContext memberContext = new MemberContext(member, member.getAuthorities());
+        MemberContext memberContext = new MemberContext(member);
 
         UsernamePasswordAuthenticationToken authentication =
                 UsernamePasswordAuthenticationToken.authenticated(
