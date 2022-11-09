@@ -38,10 +38,13 @@ public class Member extends BaseEntity {
 
     private String nickname;
 
+    @JsonIgnore
     private int authLevel;
 
+    @JsonIgnore
     private long restCash; // 예치금
 
+    @JsonIgnore
     public String getName() {
         if (nickname == null) {
             return username;
@@ -53,6 +56,7 @@ public class Member extends BaseEntity {
         super(id);
     }
 
+    @JsonIgnore
     public List<GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("MEMBER"));
@@ -68,6 +72,7 @@ public class Member extends BaseEntity {
         return authorities;
     }
 
+    @JsonIgnore
     public Map<String, Object> getAccessTokenClaims() {
         return Ut.mapOf(
                 "id", getId(),
@@ -75,6 +80,7 @@ public class Member extends BaseEntity {
                 "modifyDate", getModifyDate(),
                 "username", getUsername(),
                 "email", getEmail(),
+                "authLevel", getAuthLevel(),
                 "authorities", getAuthorities()
         );
     }

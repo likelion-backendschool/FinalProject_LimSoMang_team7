@@ -15,7 +15,6 @@ import java.util.Map;
 public class JwtProvider {
     private final SecretKey jwtSecretKey;
 
-
     public SecretKey getSecretKey() {
         return jwtSecretKey;
     }

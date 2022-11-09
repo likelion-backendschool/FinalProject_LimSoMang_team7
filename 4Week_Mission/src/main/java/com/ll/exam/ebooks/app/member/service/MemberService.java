@@ -138,7 +138,7 @@ public class MemberService {
     }
 
     private void forceAuthentication(Member member) {
-        MemberContext memberContext = new MemberContext(member, member.getAuthorities());
+        MemberContext memberContext = new MemberContext(member);
 
         UsernamePasswordAuthenticationToken authentication =
                 UsernamePasswordAuthenticationToken.authenticated(
